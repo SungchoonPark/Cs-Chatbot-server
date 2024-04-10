@@ -31,6 +31,7 @@ public enum CustomResponseStatus {
     MEMBER_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4001", "해당 유저를 찾을 수 없습니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4002", "리프레시 토큰을 찾을 수 없습니다."),
     ROLE_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4003", "해당 권한을 찾을 수 없습니다."),
+    GPT_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4004", "GPT가 응답하지 않습니다."),
 
     /***
      * 5000: NOT_MATCH

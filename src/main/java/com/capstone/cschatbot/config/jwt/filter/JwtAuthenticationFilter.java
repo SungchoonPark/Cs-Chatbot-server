@@ -30,14 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtUtil.resolveToken(request.getHeader("Authorization"));
-
         if (token.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            if (request.getRequestURI().equals("/api/v1/auth/reissue")) {
+            if (request.getRequestURI().equals("/api/v1/auth/reissue") || request.getRequestURI().equals("/api/v1/member/initial/chat")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -48,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute(EXCEPTION, CustomResponseStatus.LOGOUT_MEMBER.getMessage());
                 return;
             }
-
             Authentication authentication = jwtUtil.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (ExpiredJwtException e) {
@@ -63,10 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // true는 필터를 안타도 되는것 false는 필터를 타야하는것
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludePath = {"/api/v1/sign-in"};
         String path = request.getRequestURI();
+        String[] excludePath = {"/api/v1/sign-in", "/api/v1/member/initial/chat", "/exception"};
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

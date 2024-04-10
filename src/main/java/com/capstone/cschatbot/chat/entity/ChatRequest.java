@@ -1,8 +1,11 @@
 package com.capstone.cschatbot.chat.entity;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ChatRequest {
     private String model;
     private List<Message> messages;
