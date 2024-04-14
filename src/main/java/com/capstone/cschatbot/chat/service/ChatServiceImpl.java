@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 public class ChatServiceImpl implements ChatService {
     private static final String USER = "user";
     private static final String ASSISTANT = "assistant";
+    private static final String SYSTEM = "system";
 
     @Value("${openai.url}")
     private String apiUrl;
@@ -36,7 +37,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatDto.Response.Chat initialChat() {
         chatRequest = new ChatRequest(model);
-        chatRequest.addMessage(ASSISTANT, createInitialPrompt());
+        chatRequest.addMessage(SYSTEM, createInitialPrompt());
+        chatRequest.addMessage(USER, "안녕하십니까. 이번 네이버 백엔드 개발자에 지원한 이창민이라고"+
+                " 합니다. 잘 부탁드립니다.");
 
         ChatResponse chatResponse = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
         log.info("[RESPONSE] : " + chatResponse.getChoices().get(0).getMessage().getContent());
