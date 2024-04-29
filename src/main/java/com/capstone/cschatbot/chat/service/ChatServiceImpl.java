@@ -36,16 +36,20 @@ public class ChatServiceImpl implements ChatService {
 
     private ChatRequest chatRequest;
 
+    private ChatRequest selfChatRequest;
+
     @Override
     public ChatDto.Response.Chat initialChat(String topic) {
-        chatRequest = new ChatRequest(model);
+        chatRequest = new ChatRequest(model, 1, 256, 1, 0, 0);
         chatRequest.addMessage(SYSTEM, createInitialPrompt(topic));
-        chatRequest.addMessage(USER, "안녕하십니까. 이번 네이버 백엔드 개발자에 지원한 이창민이라고"+
-                " 합니다. 잘 부탁드립니다.");
+        chatRequest.addMessage(USER, "안녕하십니까. 잘 부탁드립니다.");
 
         ChatResponse chatResponse = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
         log.info("[RESPONSE] : " + chatResponse.getChoices().get(0).getMessage().getContent());
         String content = chatResponse.getChoices().get(0).getMessage().getContent();
+
+        chatRequest.addMessage(ASSISTANT, content); //gpt의 응답을 메시지에 추가하는 코드가 필요하지 않나??
+
         return ChatDto.Response.Chat.from(content);
     }
 
@@ -67,6 +71,43 @@ public class ChatServiceImpl implements ChatService {
 
         // 앞선 대화를 통해 뽑아낸 질문을 List에 저장
         chatRequest.addMessage(ASSISTANT, responseContent);
+
+        return ChatDto.Response.Chat.from(responseContent);
+    }
+
+    @Override
+    public ChatDto.Response.Chat selfInitChat(ChatDto.Self_Request.Chat chat) {
+        selfChatRequest = new ChatRequest(model, 1, 256, 1, 0, 0);
+        selfChatRequest.addMessage(SYSTEM, createSelfInitialPrompt(chat));
+        selfChatRequest.addMessage(USER, "안녕하십니까. 잘 부탁드립니다.");
+
+        ChatResponse chatResponse = restTemplate.postForObject(apiUrl, selfChatRequest, ChatResponse.class);
+        log.info("[RESPONSE] : " + chatResponse.getChoices().get(0).getMessage().getContent());
+        String content = chatResponse.getChoices().get(0).getMessage().getContent();
+
+        selfChatRequest.addMessage(ASSISTANT, content); //gpt의 응답을 메시지에 추가하는 코드가 필요하지 않나??
+
+        return ChatDto.Response.Chat.from(content);
+    }
+
+    @Override
+    public ChatDto.Response.Chat selfchat(ChatDto.Request.Chat prompt) {
+        // 유저의 질문에 대한 답변을 List에 저장
+        selfChatRequest.addMessage(USER, prompt.getPrompt());
+        log.info("prompt : " + prompt.getPrompt());
+        ChatResponse response = restTemplate.postForObject(apiUrl, selfChatRequest, ChatResponse.class);
+        for (Message message : selfChatRequest.getMessages()) {
+            System.out.println("role = "+ message.getRole() +"message = " + message.getContent());
+        }
+
+        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+            throw new CustomException(CustomResponseStatus.GPT_NOT_ANSWER);
+        }
+        String responseContent = response.getChoices().get(0).getMessage().getContent();
+        log.info("[RESPONSE] : " + responseContent);
+
+        // 앞선 대화를 통해 뽑아낸 질문을 List에 저장
+        selfChatRequest.addMessage(ASSISTANT, responseContent);
 
         return ChatDto.Response.Chat.from(responseContent);
     }
@@ -111,5 +152,19 @@ public class ChatServiceImpl implements ChatService {
                 "                                                \n" +
                 "\"너는 나에게 100개 이상의 질문을 해야 한다.\"";
         return MessageFormat.format(prompt, topic);
+    }
+
+
+    public String createSelfInitialPrompt(ChatDto.Self_Request.Chat self) {
+        String quest = self.getQuestion();
+        String content = self.getContent();
+
+        String prompt = "저는 자시소개서 관련 질문을 하는 면접관이다.\n" +
+                "자소서의 질문은 \"{0}\"이다.\n" +
+                "내 답변은 \"{1}\"이다.\n" +
+                "이제 내 답변을 기반으로 자소서 관련 질문을 해라.\n" +
+                "질문은 적어도 100개는 한다.\n" +
+                "질문은 한번에 하나의 질문만 한다.";
+        return MessageFormat.format(prompt, quest, content);
     }
 }
