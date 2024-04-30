@@ -65,13 +65,15 @@ public class JwtOIDCUtil {
     /** OIDC Body에 들어있는 정보들을 빼옴 */
     public OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getBody();
-        return new OIDCDecodePayload(
-                body.getIssuer(),
-                body.getAudience(),
-                body.getSubject(),
-                body.get("email", String.class),
-                body.get("picture", String.class),
-                body.get("nickname", String.class));
+
+        return OIDCDecodePayload.builder()
+                .iss(body.getIssuer())
+                .aud(body.getAudience())
+                .sub(body.getSubject())
+                .email(body.get("email", String.class))
+                .nickname(body.get("nickname", String.class))
+                .picture(body.get("picture", String.class))
+                .build();
     }
 
     private Key getRSAPublicKey(String modulus, String exponent) throws NoSuchAlgorithmException, InvalidKeySpecException {
