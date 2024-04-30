@@ -37,6 +37,7 @@ public enum CustomResponseStatus {
      * 5000: NOT_MATCH
      */
     REFRESH_TOKEN_NOT_MATCH(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "5000", "잘못된 리프레시 토큰입니다."),
+    BAD_TOKEN(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()), "5001", "잘못된 토큰입니다."),
 
     /***
      * 6000: Internal_Server_Error
