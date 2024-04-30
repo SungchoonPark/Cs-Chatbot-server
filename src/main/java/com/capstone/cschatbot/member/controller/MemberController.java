@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final AuthService authService;
 
-    @PutMapping("/login")
+    @PostMapping("/kakao/login")
     public ResponseEntity<ApiResponse<MemberDto.Response.SignIn>> login(@RequestParam String idToken) {
         MemberDto.Response.SignIn response = authService.login(idToken);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
