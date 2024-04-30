@@ -1,9 +1,11 @@
 package com.capstone.cschatbot.config.oauth.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class OIDCDecodePayload {
     /** issuer ex) https://kauth.kakao.com */
