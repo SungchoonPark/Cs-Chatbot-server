@@ -17,12 +17,6 @@ public class ChatController {
     /***
      * 여기서 시작 주제를 선택해야 하지 않나?
      */
-//    @GetMapping("/initial/chat")
-//    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> initialChat() {
-//        ChatDto.Response.Chat response = chatService.initialChat();
-//        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
-//    }
-
     @GetMapping("/initial/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> initialChat(@RequestParam("topic") String topic) {
         ChatDto.Response.Chat response = chatService.initialChat(topic);
@@ -32,6 +26,18 @@ public class ChatController {
     @GetMapping("/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> chat(@RequestParam ChatDto.Request.Chat prompt) {
         ChatDto.Response.Chat response = chatService.chat(prompt);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
+
+    @GetMapping("/self/initial/chat")
+    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> selfinitialChat(@RequestBody ChatDto.Self_Request.Chat chat) {
+        ChatDto.Response.Chat response = chatService.selfInitChat(chat);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
+
+    @GetMapping("/self/chat")
+    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> selfchat(@RequestParam ChatDto.Request.Chat prompt) {
+        ChatDto.Response.Chat response = chatService.selfchat(prompt);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 }
