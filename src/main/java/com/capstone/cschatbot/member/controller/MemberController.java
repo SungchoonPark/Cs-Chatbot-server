@@ -25,4 +25,10 @@ public class MemberController {
         MemberDto.Response.Reissue response = authService.reissue(refreshToken);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String accessToken) {
+        authService.logout(accessToken);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess("Logout Success", CustomResponseStatus.SUCCESS));
+    }
 }

@@ -31,6 +31,7 @@ public class AuthServiceImpl implements AuthService{
     private final JwtUtil jwtUtil;
 
     private static final String RT = "RT:";
+    private static final String LOGOUT = "LOGOUT:";
 
     @Override
     public MemberDto.Response.SignIn login(String idToken) {
@@ -71,5 +72,16 @@ public class AuthServiceImpl implements AuthService{
         redisUtil.setData(RT + idInToken, generate.getRefreshToken(), jwtUtil.getExpiration(TokenType.REFRESH_TOKEN));
 
         return MemberDto.Response.Reissue.from(generate);
+    }
+
+    @Override
+    public void logout(String accessToken) {
+        String resolveToken = jwtUtil.resolveToken(accessToken);
+        String idInToken = jwtUtil.getIdInToken(resolveToken);
+        String refreshTokenInRedis = redisUtil.getData(RT + idInToken);
+        if (refreshTokenInRedis == null) throw new CustomException(CustomResponseStatus.REFRESH_TOKEN_NOT_FOUND);
+
+        redisUtil.deleteDate(RT + idInToken);
+        redisUtil.setData(LOGOUT, resolveToken, jwtUtil.getExpiration(resolveToken));
     }
 }

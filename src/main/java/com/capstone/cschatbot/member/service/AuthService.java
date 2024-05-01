@@ -11,4 +11,6 @@ public interface AuthService {
     Member forceJoin(OauthInfo oauthInfo);
 
     MemberDto.Response.Reissue reissue(String refreshToken);
+
+    void logout(String accessToken);
 }
