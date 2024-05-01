@@ -81,6 +81,15 @@ public class ChatServiceImpl implements ChatService {
         return ChatDto.Response.Chat.from(responseContent);
     }
 
+    @Override
+    public void endChat(String memberId) {
+        if (!memberChatMap.containsKey(memberId)) {
+            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
+        }
+
+        memberChatMap.remove(memberId);
+    }
+
     private ChatDto.Response.Chat chatWithGPT(String memberId, ChatRequest chatRequest) {
         addChatMessage(chatRequest, USER, INITIAL_USER_MESSAGE);
 

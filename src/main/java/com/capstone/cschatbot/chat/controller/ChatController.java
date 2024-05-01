@@ -32,8 +32,8 @@ public class ChatController {
     @GetMapping("/self/initial/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> selfInitialChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody ChatDto.Request.SelfChat chat) {
-
+            @RequestBody ChatDto.Request.SelfChat chat
+    ) {
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
                 chatService.selfInitChat(principalDetails.getMemberId(), chat),
                 CustomResponseStatus.SUCCESS)
@@ -43,11 +43,20 @@ public class ChatController {
     @GetMapping("/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> chat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam ChatDto.Request.Chat prompt) {
-
+            @RequestParam ChatDto.Request.Chat prompt
+    ) {
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
                 chatService.chat(principalDetails.getMemberId(), prompt),
                 CustomResponseStatus.SUCCESS)
         );
     }
+
+    @PostMapping("/end/chat")
+    public ResponseEntity<ApiResponse<String>> endChat(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        chatService.endChat(principalDetails.getMemberId());
+        return ResponseEntity.ok().body(ApiResponse.createSuccess("채팅이 종료되었습니다.", CustomResponseStatus.SUCCESS));
+    }
+
 }
