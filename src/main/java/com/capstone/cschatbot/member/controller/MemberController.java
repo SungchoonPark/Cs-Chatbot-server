@@ -19,4 +19,10 @@ public class MemberController {
         MemberDto.Response.SignIn response = authService.login(idToken);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<MemberDto.Response.Reissue>> reissue(@RequestHeader("Authorization") String refreshToken) {
+        MemberDto.Response.Reissue response = authService.reissue(refreshToken);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
 }
