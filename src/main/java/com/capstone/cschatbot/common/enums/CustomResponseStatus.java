@@ -23,6 +23,7 @@ public enum CustomResponseStatus {
      */
     ACCESS_DENIED(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "3000", "인증되지 않은 사용자입니다."),
     LOGOUT_MEMBER(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "3001", "로그아웃된 사용자입니다."),
+    ALREADY_MAP_EXIST(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "3002", "이미 존재하는 채팅 입니다. 새롭게 시작할 수 없습니다."),
 
     /***
      * 4000: NOT_FOUND
@@ -32,6 +33,7 @@ public enum CustomResponseStatus {
     REFRESH_TOKEN_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4002", "리프레시 토큰을 찾을 수 없습니다."),
     ROLE_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4003", "해당 권한을 찾을 수 없습니다."),
     GPT_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4004", "GPT가 응답하지 않습니다."),
+    MAP_VALUE_NOT_EXIST(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4005", "채팅이 존재하지 않습니다. 채팅을 새롭게 시작해주세요."),
 
     /***
      * 5000: NOT_MATCH

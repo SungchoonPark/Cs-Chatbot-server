@@ -3,16 +3,6 @@ package com.capstone.cschatbot.chat.dto;
 import lombok.*;
 
 public class ChatDto {
-    public static class Self_Request {
-        @Getter
-        @Builder
-        @AllArgsConstructor
-        @NoArgsConstructor
-        public static class Chat {
-            private String question;
-            private String content;
-        }
-    }
 
     public static class Request {
         @Getter
@@ -21,7 +11,15 @@ public class ChatDto {
         @NoArgsConstructor
         public static class Chat {
             private String prompt;
+        }
 
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class SelfChat {
+            private String question;
+            private String content;
         }
     }
 

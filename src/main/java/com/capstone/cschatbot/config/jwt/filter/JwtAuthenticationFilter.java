@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            if (request.getRequestURI().equals("/api/v1/auth/reissue") || request.getRequestURI().equals("/api/v1/member/initial/chat")) {
+            if (request.getRequestURI().equals("/api/v1/auth/reissue")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        String[] excludePath = {"/api/v1/sign-in", "/api/v1/member/initial/chat", "/exception"};
+        String[] excludePath = {"/api/v1/sign-in", "/exception"};
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

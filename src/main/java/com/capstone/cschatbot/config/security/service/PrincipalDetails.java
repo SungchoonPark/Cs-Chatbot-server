@@ -30,6 +30,10 @@ public class PrincipalDetails implements UserDetails {
         return null;
     }
 
+    public String getMemberId() {
+        return member.getId().toString();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return false;
