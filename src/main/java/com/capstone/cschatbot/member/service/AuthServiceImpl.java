@@ -1,5 +1,8 @@
 package com.capstone.cschatbot.member.service;
 
+import com.capstone.cschatbot.common.entity.AuthTokens;
+import com.capstone.cschatbot.common.enums.CustomResponseStatus;
+import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.config.jwt.util.AuthTokenGenerator;
 import com.capstone.cschatbot.config.jwt.util.JwtUtil;
 import com.capstone.cschatbot.config.jwt.util.TokenType;
@@ -13,6 +16,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -49,5 +54,22 @@ public class AuthServiceImpl implements AuthService{
     public Member forceJoin(OauthInfo oauthInfo) {
         Member newMember = Member.from(oauthInfo);
         return memberRepository.save(newMember);
+    }
+
+    @Override
+    public MemberDto.Response.Reissue reissue(String refreshToken) {
+        String resolveToken = jwtUtil.resolveToken(refreshToken);
+        String idInToken = jwtUtil.getIdInToken(resolveToken);
+
+        String refreshTokenInRedis = redisUtil.getData(RT + idInToken);
+
+        if (!Objects.equals(resolveToken, refreshTokenInRedis)) {
+            throw new CustomException(CustomResponseStatus.REFRESH_TOKEN_NOT_MATCH);
+        }
+
+        AuthTokens generate = authTokenGenerator.generate(idInToken);
+        redisUtil.setData(RT + idInToken, generate.getRefreshToken(), jwtUtil.getExpiration(TokenType.REFRESH_TOKEN));
+
+        return MemberDto.Response.Reissue.from(generate);
     }
 }

@@ -71,7 +71,7 @@ public class JwtUtil {
      * @return : 토큰속(claim)에 있는 클라이언트의 email을 리턴
      */
     public String getIdInToken(String token) {
-        return extractAllClaims(token).get("email", String.class);
+        return extractAllClaims(token).get("id", String.class);
     }
 
     /***

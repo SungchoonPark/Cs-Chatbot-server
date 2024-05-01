@@ -9,4 +9,6 @@ public interface AuthService {
     MemberDto.Response.SignIn login(String idToken);
 
     Member forceJoin(OauthInfo oauthInfo);
+
+    MemberDto.Response.Reissue reissue(String refreshToken);
 }
