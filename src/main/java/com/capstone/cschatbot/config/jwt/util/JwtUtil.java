@@ -48,14 +48,6 @@ public class JwtUtil {
 
     /***
      * @param token : 요청이 들어온 토큰
-     * @return : token을 파싱. 즉, 디코딩 하여 리턴
-     */
-    public Claims parseToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSigningKey(SECRET_KEY)).build().parseClaimsJws(token).getBody();
-    }
-
-    /***
-     * @param token : 요청이 들어온 토큰
      * @return : 토큰을 파싱하여 토큰에 들어있는 Claim을 리턴
      */
     private Claims extractAllClaims(String token) {

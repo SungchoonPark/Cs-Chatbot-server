@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class ChatController {
     private final ChatService chatService;
 
-    /***
-     * 여기서 시작 주제를 선택해야 하지 않나?
-     */
     @GetMapping("/initial/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> initialChat(@RequestParam("topic") String topic) {
         ChatDto.Response.Chat response = chatService.initialChat(topic);
