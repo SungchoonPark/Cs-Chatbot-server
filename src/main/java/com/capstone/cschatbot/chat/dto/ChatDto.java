@@ -13,7 +13,7 @@ public class ChatDto {
             private String prompt;
         }
 
-        @Getter
+        @Data
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
