@@ -32,8 +32,9 @@ public class ChatController {
     @GetMapping("/self/initial/chat")
     public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> selfInitialChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody ChatDto.Request.SelfChat chat
+            @ModelAttribute ChatDto.Request.SelfChat chat
     ) {
+        log.info("question : {} content : {}", chat.getQuestion(), chat.getContent());
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
                 chatService.selfInitChat(principalDetails.getMemberId(), chat),
                 CustomResponseStatus.SUCCESS)
