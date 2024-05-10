@@ -42,7 +42,7 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> chat(
+    public ResponseEntity<ApiResponse<ChatDto.Response.EvaluationAndQuestion>> chat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam ChatDto.Request.Chat prompt
     ) {

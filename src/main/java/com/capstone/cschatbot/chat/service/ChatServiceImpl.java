@@ -3,6 +3,7 @@ package com.capstone.cschatbot.chat.service;
 import com.capstone.cschatbot.chat.dto.ChatDto;
 import com.capstone.cschatbot.chat.entity.ChatRequest;
 import com.capstone.cschatbot.chat.entity.ChatResponse;
+import com.capstone.cschatbot.chat.entity.Evaluation;
 import com.capstone.cschatbot.chat.entity.Message;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatDto.Response.Chat chat(String memberId, ChatDto.Request.Chat prompt) {
+    public ChatDto.Response.EvaluationAndQuestion chat(String memberId, ChatDto.Request.Chat prompt) {
         if (!memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
         }
@@ -68,17 +71,34 @@ public class ChatServiceImpl implements ChatService {
         ChatRequest chatRequest = memberChatMap.get(memberId);
         addChatMessage(chatRequest, USER, prompt.getPrompt());
 
-        ChatResponse response = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
-        checkValidResponse(response);
+        // 답변 평가 서버로부터 답변 평가 내용 받아오기
 
-        String responseContent = response.getChoices().get(0).getMessage().getContent();
+        URI uri = UriComponentsBuilder
+                .fromUriString("localhost:8000/api/search")
+                .queryParam("q", prompt.getPrompt())
+                .encode()
+                .build()
+                .toUri();
 
-        addChatMessage(chatRequest, ASSISTANT, responseContent);
+        RestTemplate evaluationRestTemplate = new RestTemplate();
+        Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
+
+        log.info("평가 내용 : {}", evaluation);
+
+        // 여기까지
+
+
+        ChatResponse gptResponse = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
+        checkValidResponse(gptResponse);
+
+        String newQuestion = gptResponse.getChoices().get(0).getMessage().getContent();
+
+        addChatMessage(chatRequest, ASSISTANT, newQuestion);
         for (Message message : chatRequest.getMessages()) {
             log.info("role = " + message.getRole() + ", message = " + message.getContent());
         }
 
-        return ChatDto.Response.Chat.from(responseContent);
+        return ChatDto.Response.EvaluationAndQuestion.of(evaluation, newQuestion);
     }
 
     @Override
