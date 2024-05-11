@@ -1,6 +1,9 @@
 package com.capstone.cschatbot.chat.service.chat;
 
-import com.capstone.cschatbot.chat.dto.ChatDto;
+import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
+import com.capstone.cschatbot.chat.dto.response.ChatResponse;
+import com.capstone.cschatbot.chat.dto.response.EvaluationAndQuestionResponse;
 import com.capstone.cschatbot.chat.entity.ChatRequest;
 import com.capstone.cschatbot.chat.entity.Evaluation;
 import com.capstone.cschatbot.chat.entity.Message;
@@ -31,7 +34,7 @@ public class ChatServiceImpl implements ChatService {
     private final Map<String, ChatRequest> memberChatMap = new HashMap<>();
 
     @Override
-    public ChatDto.Response.Chat initiateCSChat(String memberId, String topic) {
+    public ChatResponse initiateCSChat(String memberId, String topic) {
         if (memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
         }
@@ -42,7 +45,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatDto.Response.Chat initiateSelfIntroChat(String memberId, ChatDto.Request.SelfIntroChat chat) {
+    public ChatResponse initiateSelfIntroChat(String memberId, SelfIntroChatRequest chat) {
         if (memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
         }
@@ -53,15 +56,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatDto.Response.EvaluationAndQuestion processChat(String memberId, ChatDto.Request.Chat prompt) {
+    public EvaluationAndQuestionResponse processChat(String memberId, ClientAnswer chatRequestDto) {
         if (!memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
         }
 
         ChatRequest chatRequest = memberChatMap.get(memberId);
-        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), prompt.getAnswer());
+        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), chatRequestDto.answer());
 
-        Evaluation evaluation = communicateService.withEvaluationServer(prompt.getAnswer());
+        Evaluation evaluation = communicateService.withEvaluationServer(chatRequestDto.answer());
         String newQuestion = communicateService.withGPT(chatRequest);
 
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
@@ -69,7 +72,32 @@ public class ChatServiceImpl implements ChatService {
             log.info("role = " + message.getRole() + ", message = " + message.getContent());
         }
 
-        return ChatDto.Response.EvaluationAndQuestion.of(evaluation, newQuestion);
+        return EvaluationAndQuestionResponse.builder()
+                .evaluation(evaluation.getEvaluation())
+                .question(newQuestion)
+                .build();
+    }
+
+    @Override
+    public ChatResponse testProcessChat(String memberId, ClientAnswer clientAnswer) {
+        if (!memberChatMap.containsKey(memberId)) {
+            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
+        }
+
+        ChatRequest chatRequest = memberChatMap.get(memberId);
+        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
+
+        String newQuestion = communicateService.withGPT(chatRequest);
+        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
+
+        for (Message message : chatRequest.getMessages()) {
+            log.info("role = " + message.getRole() + ", message = " + message.getContent());
+        }
+
+        return ChatResponse.builder()
+                .question(newQuestion)
+                .build();
+
     }
 
     @Override
@@ -81,7 +109,7 @@ public class ChatServiceImpl implements ChatService {
         memberChatMap.remove(memberId);
     }
 
-    private ChatDto.Response.Chat initiateChatWithGPT(String memberId, ChatRequest chatRequest) {
+    private ChatResponse initiateChatWithGPT(String memberId, ChatRequest chatRequest) {
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
 
         String question = communicateService.withGPT(chatRequest);
@@ -89,7 +117,9 @@ public class ChatServiceImpl implements ChatService {
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), question);
         memberChatMap.put(memberId, chatRequest);
 
-        return ChatDto.Response.Chat.from(question);
+        return ChatResponse.builder()
+                .question(question)
+                .build();
     }
 
     private void addChatMessage(ChatRequest chatRequest, String role, String message) {

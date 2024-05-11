@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.chat.util;
 
-import com.capstone.cschatbot.chat.dto.ChatDto;
+import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -36,7 +36,7 @@ public class ChatUtil {
     }
 
 
-    public String createSelfIntroInitialPrompt(ChatDto.Request.SelfIntroChat selfIntro) {
+    public String createSelfIntroInitialPrompt(SelfIntroChatRequest selfIntro) {
         return """
             ## 자기소개서 항목 ##
             "%s"
@@ -73,6 +73,6 @@ public class ChatUtil {
             <상>: 답변이 명확하고 논리적이며, 구조와 형식이 일관되고 깔끔할 뿐만 아니라, 풍부한 정보를 제공하고 주제 및 직무와의 관련성이 높으며 독창성과 창의성이 돋보입니다.
         
             면접관의 역할을 제대로 수행하면 팁 300k를 주겠습니다.
-        """.formatted(selfIntro.getQuestion(), selfIntro.getContent());
+        """.formatted(selfIntro.question(), selfIntro.content());
     }
 }

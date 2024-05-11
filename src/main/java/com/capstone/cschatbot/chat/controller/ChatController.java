@@ -1,6 +1,9 @@
 package com.capstone.cschatbot.chat.controller;
 
-import com.capstone.cschatbot.chat.dto.ChatDto;
+import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
+import com.capstone.cschatbot.chat.dto.response.ChatResponse;
+import com.capstone.cschatbot.chat.dto.response.EvaluationAndQuestionResponse;
 import com.capstone.cschatbot.chat.service.chat.ChatService;
 import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
@@ -18,8 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class ChatController {
     private final ChatService chatService;
 
-    @GetMapping("/initial/chat")
-    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> initiateCSChat(
+    @GetMapping("/initial/chat/cs")
+    public ResponseEntity<ApiResponse<ChatResponse>> initiateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam("topic") String topic) {
 
@@ -29,10 +32,10 @@ public class ChatController {
         );
     }
 
-    @GetMapping("/self/initial/chat")
-    public ResponseEntity<ApiResponse<ChatDto.Response.Chat>> initiateSelfIntroChat(
+    @GetMapping("/initial/chat/self_intro")
+    public ResponseEntity<ApiResponse<ChatResponse>> initiateSelfIntroChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @ModelAttribute ChatDto.Request.SelfIntroChat chat
+            @ModelAttribute SelfIntroChatRequest chat
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
@@ -42,12 +45,26 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<ApiResponse<ChatDto.Response.EvaluationAndQuestion>> processChat(
+    public ResponseEntity<ApiResponse<EvaluationAndQuestionResponse>> processChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam ChatDto.Request.Chat prompt
+            @RequestParam ClientAnswer clientAnswer
     ) {
+
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
-                chatService.processChat(principalDetails.getMemberId(), prompt),
+                chatService.processChat(principalDetails.getMemberId(), clientAnswer),
+                CustomResponseStatus.SUCCESS)
+        );
+    }
+
+    /** 백엔드 테스트용 컨트롤러 */
+    @GetMapping("/chat/test")
+    public ResponseEntity<ApiResponse<ChatResponse>> testProcessChat(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @RequestParam(name = "client_answer") ClientAnswer clientAnswer
+    ) {
+
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(
+                chatService.testProcessChat(principalDetails.getMemberId(), clientAnswer),
                 CustomResponseStatus.SUCCESS)
         );
     }

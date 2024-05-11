@@ -1,11 +1,15 @@
 package com.capstone.cschatbot.chat.service.chat;
 
-import com.capstone.cschatbot.chat.dto.ChatDto;
+import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
+import com.capstone.cschatbot.chat.dto.response.ChatResponse;
+import com.capstone.cschatbot.chat.dto.response.EvaluationAndQuestionResponse;
 
 public interface ChatService {
-    ChatDto.Response.Chat initiateCSChat(String memberId, String topic);
-    ChatDto.Response.Chat initiateSelfIntroChat(String memberId, ChatDto.Request.SelfIntroChat chat);
-    ChatDto.Response.EvaluationAndQuestion processChat(String memberId, ChatDto.Request.Chat prompt);
+    ChatResponse initiateCSChat(String memberId, String topic);
+    ChatResponse initiateSelfIntroChat(String memberId, SelfIntroChatRequest chat);
+    EvaluationAndQuestionResponse processChat(String memberId, ClientAnswer clientAnswer);
+    ChatResponse testProcessChat(String memberId, ClientAnswer clientAnswer);
     void terminateChat(String memberId);
 
 }
