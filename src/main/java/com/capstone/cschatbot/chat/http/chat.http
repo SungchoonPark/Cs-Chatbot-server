@@ -1,5 +1,0 @@
-### 첫 질문 생성
-GET localhost:8080/api/v1/member/initial/chat?topic=데이터베이스
-
-### 이후의 대화
-GET localhost:8080/api/v1/member/chat?prompt=넵
