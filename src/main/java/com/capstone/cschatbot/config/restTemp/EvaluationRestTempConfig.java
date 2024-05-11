@@ -12,7 +12,7 @@ public class EvaluationRestTempConfig {
     @Qualifier("evaluationRestTemplate")
     public RestTemplate evaluationRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add((request, body, execution) -> execution.execute(request, null));
+        restTemplate.getInterceptors().add((request, body, execution) -> execution.execute(request, body));
         return restTemplate;
     }
 }
