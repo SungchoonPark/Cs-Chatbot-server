@@ -5,9 +5,7 @@ import com.capstone.cschatbot.chat.entity.ChatResponse;
 import com.capstone.cschatbot.chat.entity.Evaluation;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,18 +15,22 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Slf4j
-public class CommunicateServiceImpl implements CommunicateService{
+public class CommunicateServiceImpl implements CommunicateService {
     @Value("${evaluation.url}")
     private String evaluationUrl;
 
     @Value("${openai.url}")
     private String apiUrl;
+    private final RestTemplate evaluationRestTemplate;
+    private final RestTemplate gptRestTemplate;
 
-    @Qualifier("chatRestTemplate")
-    @Autowired
-    private final RestTemplate restTemplate;
+    public CommunicateServiceImpl(@Qualifier("evaluationRestTemplate") RestTemplate evaluationRestTemplate,
+                                  @Qualifier("gptRestTemplate") RestTemplate gptRestTemplate) {
+        this.evaluationRestTemplate = evaluationRestTemplate;
+        this.gptRestTemplate = gptRestTemplate;
+    }
 
     @Override
     public Evaluation withEvaluationServer(String clientAnswer) {
@@ -40,7 +42,6 @@ public class CommunicateServiceImpl implements CommunicateService{
                 .toUri();
 
         // TODO : RestTemplate 객체의 빈번한 생성을 막아야함
-        RestTemplate evaluationRestTemplate = new RestTemplate();
         Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
         checkValidEvaluationResponse(evaluation);
 
@@ -50,7 +51,7 @@ public class CommunicateServiceImpl implements CommunicateService{
 
     @Override
     public String withGPT(ChatRequest chatRequest) {
-        ChatResponse gptResponse = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
+        ChatResponse gptResponse = gptRestTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
         checkValidGptResponse(gptResponse);
 
         return gptResponse.getChoices().get(0).getMessage().getContent();

@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.config;
+package com.capstone.cschatbot.config.redis;
 
 
 import org.springframework.cache.CacheManager;

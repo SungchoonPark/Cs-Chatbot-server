@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.config;
+package com.capstone.cschatbot.config.restTemp;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class ChatConfig {
+public class GPTRestTempConfig {
     @Value("${openai.secret-key}")
     private String secretKey;
 
     @Bean
-    @Qualifier("chatRestTemplate")
-    public RestTemplate chatRestTemplate() {
+    @Qualifier("gptRestTemplate")
+    public RestTemplate gptRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + secretKey);

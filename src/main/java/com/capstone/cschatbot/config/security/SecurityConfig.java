@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.config;
+package com.capstone.cschatbot.config.security;
 
 import com.capstone.cschatbot.config.jwt.filter.JwtAuthenticationFilter;
 import com.capstone.cschatbot.config.jwt.handler.JwtAccessDeniedHandler;

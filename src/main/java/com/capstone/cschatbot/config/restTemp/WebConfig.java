@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.config;
+package com.capstone.cschatbot.config.restTemp;
 
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
