@@ -41,7 +41,6 @@ public class CommunicateServiceImpl implements CommunicateService {
                 .build()
                 .toUri();
 
-        // TODO : RestTemplate 객체의 빈번한 생성을 막아야함
         Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
         checkValidEvaluationResponse(evaluation);
 
