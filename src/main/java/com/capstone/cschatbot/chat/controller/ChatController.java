@@ -2,7 +2,7 @@ package com.capstone.cschatbot.chat.controller;
 
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
-import com.capstone.cschatbot.chat.dto.response.ChatResponse;
+import com.capstone.cschatbot.chat.dto.response.NewQuestion;
 import com.capstone.cschatbot.chat.dto.response.EvaluationAndQuestionResponse;
 import com.capstone.cschatbot.chat.service.chat.ChatService;
 import com.capstone.cschatbot.common.dto.ApiResponse;
@@ -22,7 +22,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping("/initial/chat/cs")
-    public ResponseEntity<ApiResponse<ChatResponse>> initiateCSChat(
+    public ResponseEntity<ApiResponse<NewQuestion>> initiateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam("topic") String topic) {
 
@@ -33,7 +33,7 @@ public class ChatController {
     }
 
     @GetMapping("/initial/chat/self_intro")
-    public ResponseEntity<ApiResponse<ChatResponse>> initiateSelfIntroChat(
+    public ResponseEntity<ApiResponse<NewQuestion>> initiateSelfIntroChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @ModelAttribute SelfIntroChatRequest chat
     ) {
@@ -45,7 +45,7 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<ApiResponse<EvaluationAndQuestionResponse>> processChat(
+    public ResponseEntity<ApiResponse<NewQuestion>> processChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "client_answer") ClientAnswer clientAnswer
     ) {
@@ -58,7 +58,7 @@ public class ChatController {
 
     /** 백엔드 테스트용 컨트롤러 */
     @GetMapping("/chat/test")
-    public ResponseEntity<ApiResponse<ChatResponse>> testProcessChat(
+    public ResponseEntity<ApiResponse<NewQuestion>> testProcessChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "client_answer") ClientAnswer clientAnswer
     ) {

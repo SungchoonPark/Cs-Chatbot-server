@@ -3,4 +3,4 @@ package com.capstone.cschatbot.chat.dto.response;
 import lombok.Builder;
 
 @Builder
-public record ChatResponse(String question) {}
+public record NewQuestion(String question) {}
