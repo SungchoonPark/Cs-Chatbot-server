@@ -47,7 +47,7 @@ public class ChatController {
     @GetMapping("/chat")
     public ResponseEntity<ApiResponse<EvaluationAndQuestionResponse>> processChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam ClientAnswer clientAnswer
+            @RequestParam(name = "client_answer") ClientAnswer clientAnswer
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
