@@ -36,7 +36,7 @@ public class CommunicateServiceImpl implements CommunicateService {
     public Evaluation withEvaluationServer(String clientAnswer) {
         URI uri = UriComponentsBuilder
                 .fromUriString(evaluationUrl)
-                .queryParam("q", clientAnswer)
+                .queryParam("answer", clientAnswer)
                 .encode()
                 .build()
                 .toUri();
