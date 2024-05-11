@@ -29,7 +29,6 @@ public class ChatRequest {
         return new ChatRequest(model, temperature, maxTokens, topP, frequencyPenalty, presencePenalty);
     }
 
-
     public void addMessage(String role, String responseContent) {
         this.messages.add(new Message(role, responseContent));
     }

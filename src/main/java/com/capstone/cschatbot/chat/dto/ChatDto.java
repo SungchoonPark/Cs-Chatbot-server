@@ -11,14 +11,14 @@ public class ChatDto {
         @AllArgsConstructor
         @NoArgsConstructor
         public static class Chat {
-            private String prompt;
+            private String answer;
         }
 
         @Data
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class SelfChat {
+        public static class SelfIntroChat {
             private String question;
             private String content;
         }
@@ -30,10 +30,10 @@ public class ChatDto {
         @AllArgsConstructor
         @NoArgsConstructor
         public static class Chat {
-            private String answer;
-            public static Chat from(String answer) {
+            private String question;
+            public static Chat from(String question) {
                 return Chat.builder()
-                        .answer(answer)
+                        .question(question)
                         .build();
             }
         }

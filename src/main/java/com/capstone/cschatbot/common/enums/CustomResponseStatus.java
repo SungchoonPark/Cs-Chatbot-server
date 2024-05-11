@@ -34,6 +34,7 @@ public enum CustomResponseStatus {
     ROLE_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4003", "해당 권한을 찾을 수 없습니다."),
     GPT_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4004", "GPT가 응답하지 않습니다."),
     MAP_VALUE_NOT_EXIST(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4005", "채팅이 존재하지 않습니다. 채팅을 새롭게 시작해주세요."),
+    EVALUATION_SERVER_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4006", "평가서버가 응답하지 않습니다."),
 
     /***
      * 5000: NOT_MATCH
