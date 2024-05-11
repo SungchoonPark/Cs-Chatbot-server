@@ -17,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class ChatServiceImpl implements ChatService {
         addChatMessage(chatRequest, USER, prompt.getPrompt());
 
         // 답변 평가 서버로부터 답변 평가 내용 받아오기
-
+        // evaluation과 answer로 바뀔예정
         URI uri = UriComponentsBuilder
                 .fromUriString("localhost:8000/api/search")
                 .queryParam("q", prompt.getPrompt())
