@@ -56,19 +56,6 @@ public class ChatController {
         );
     }
 
-    /** 백엔드 테스트용 컨트롤러 */
-    @GetMapping("/chat/test")
-    public ResponseEntity<ApiResponse<NewQuestion>> testProcessChat(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "client_answer") ClientAnswer clientAnswer
-    ) {
-
-        return ResponseEntity.ok().body(ApiResponse.createSuccess(
-                chatService.testProcessChat(principalDetails.getMemberId(), clientAnswer),
-                CustomResponseStatus.SUCCESS)
-        );
-    }
-
     // TODO : 채팅 종료시 답변 평가를 보여준다면 로직이 많이 변할 예정
     @PostMapping("/end/chat")
     public ResponseEntity<ApiResponse<String>> terminateChat(
