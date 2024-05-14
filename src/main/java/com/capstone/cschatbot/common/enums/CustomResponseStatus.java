@@ -24,6 +24,7 @@ public enum CustomResponseStatus {
     ACCESS_DENIED(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "3000", "인증되지 않은 사용자입니다."),
     LOGOUT_MEMBER(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "3001", "로그아웃된 사용자입니다."),
     ALREADY_MAP_EXIST(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "3002", "이미 존재하는 채팅 입니다. 새롭게 시작할 수 없습니다."),
+    ALREADY_EVALUATION_MAP_EXIST(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "3003", "평가리스트가 존재합니다. 새롭게 만들 수 없습니다."),
 
     /***
      * 4000: NOT_FOUND
