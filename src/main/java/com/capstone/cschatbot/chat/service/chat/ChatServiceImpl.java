@@ -5,7 +5,8 @@ import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
 import com.capstone.cschatbot.chat.dto.response.NewQuestion;
 import com.capstone.cschatbot.chat.entity.*;
 import com.capstone.cschatbot.chat.entity.enums.GPTRoleType;
-import com.capstone.cschatbot.chat.service.communicate.CommunicateService;
+import com.capstone.cschatbot.chat.service.communicate.GPTService;
+import com.capstone.cschatbot.chat.service.evaluation.EvaluationService;
 import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -28,16 +30,22 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatUtil chatUtil;
 
-    private final CommunicateService communicateService;
+    private final GPTService GPTService;
+
+    private final EvaluationService evaluationService;
     private final Map<String, ChatRequest> memberChatMap = new HashMap<>();
-    private final Map<String, MemberChatEvaluation> memberChatEvaluationMap = new HashMap<>();
+    private final Map<String, List<CompletableFuture<ChatEvaluation>>> memberEvaluations = new ConcurrentHashMap<>();
 
     @Override
     public NewQuestion initiateCSChat(String memberId, String topic) {
         if (memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
         }
+        if (memberEvaluations.containsKey(memberId)) {
+            throw new CustomException((CustomResponseStatus.ALREADY_EVALUATION_MAP_EXIST));
+        }
 
+        memberEvaluations.put(memberId, new LinkedList<>());
         ChatRequest chatRequest = ChatRequest.of(model, 1, 256, 1, 0, 0);
         addChatMessage(chatRequest, GPTRoleType.SYSTEM.getRole(), chatUtil.createCSInitialPrompt(topic));
         return initiateChatWithGPT(memberId, chatRequest);
@@ -61,75 +69,52 @@ public class ChatServiceImpl implements ChatService {
         }
 
         ChatRequest chatRequest = memberChatMap.get(memberId);
-
-        Chat chat = Chat.of(
-                chatRequest.getMessages().get(chatRequest.getMessages().size()).getContent(), // 질문
-                clientAnswer.answer() // 답변
-        );
+        String question = chatRequest.getMessages().get(chatRequest.getMessages().size() - 1).getContent();
+        String answer = clientAnswer.answer();
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
 
-        String newQuestion = communicateService.withGPT(chatRequest);
+        String newQuestion = GPTService.getNewQuestion(chatRequest);
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
 
         for (Message message : chatRequest.getMessages()) {
             log.info("role = " + message.getRole() + ", message = " + message.getContent());
         }
 
-        CompletableFuture<Evaluation> evaluationAsync = getEvaluationAsync(clientAnswer);
-        evaluationAsync.thenAcceptAsync(evaluation -> {
-            ChatEvaluation chatEvaluation = ChatEvaluation.of(chat, evaluation.getEvaluation());
-            if(!memberChatEvaluationMap.containsKey(memberId)) {
-                MemberChatEvaluation memberChatEvaluation = new MemberChatEvaluation();
-                memberChatEvaluation.addNewChatEvaluation(chatEvaluation);
-                memberChatEvaluationMap.put(memberId, memberChatEvaluation);
-            }
-
-            memberChatEvaluationMap.get(memberId).addNewChatEvaluation(chatEvaluation);
-
-            for (ChatEvaluation chatEvaluation1 : memberChatEvaluationMap.get(memberId).getChatEvaluations()) {
-                log.info("question : {} \n answer : {} \n evaluation : {}", chatEvaluation1.getChat().getQuestion(), chatEvaluation1.getChat().getAnswer(), chatEvaluation1.getEvaluation());
-            }
-        });
+        final CompletableFuture<ChatEvaluation> chatEvaluationFuture = evaluationService.getEvaluation(question, answer);
+        List<CompletableFuture<ChatEvaluation>> completableFutures = memberEvaluations.computeIfAbsent(memberId, k -> new ArrayList<>());
+        completableFutures.add(chatEvaluationFuture);
 
         return NewQuestion.builder()
                 .question(newQuestion)
                 .build();
     }
 
-    @Override
-    public NewQuestion testProcessChat(String memberId, ClientAnswer clientAnswer) {
-        if (!memberChatMap.containsKey(memberId)) {
-            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-        }
-
-        ChatRequest chatRequest = memberChatMap.get(memberId);
-        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
-
-        String newQuestion = communicateService.withGPT(chatRequest);
-        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
-        for (Message message : chatRequest.getMessages()) {
-            log.info("role = " + message.getRole() + ", message = " + message.getContent());
-        }
-
-        return NewQuestion.builder()
-                .question(newQuestion)
-                .build();
-
-    }
-
+    // TODO : 자소서용 채팅 종료 따로 만들어야함.
     @Override
     public void terminateChat(String memberId) {
         if (!memberChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
         }
+        List<CompletableFuture<ChatEvaluation>> evaluations = memberEvaluations.remove(memberId);
 
+        CompletableFuture<Void> allOfFuture = CompletableFuture.allOf(evaluations.toArray(new CompletableFuture[0]));
+        allOfFuture.thenRun(() -> {
+            log.info("[평가 끝] 모든 비동기 요청 작업 종료");
+            for (CompletableFuture<ChatEvaluation> evaluation : evaluations) {
+                evaluation.thenAccept(chatEvaluation -> {
+                    log.info("질문 : {}", chatEvaluation.getQuestion());
+                    log.info("답변 : {}", chatEvaluation.getAnswer());
+                    log.info("평가 결과: {}", chatEvaluation.getEvaluation().getEvaluation());
+                });
+            }
+        });
         memberChatMap.remove(memberId);
     }
 
     private NewQuestion initiateChatWithGPT(String memberId, ChatRequest chatRequest) {
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
 
-        String question = communicateService.withGPT(chatRequest);
+        String question = GPTService.getNewQuestion(chatRequest);
 
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), question);
         memberChatMap.put(memberId, chatRequest);
@@ -137,10 +122,6 @@ public class ChatServiceImpl implements ChatService {
         return NewQuestion.builder()
                 .question(question)
                 .build();
-    }
-
-    private CompletableFuture<Evaluation> getEvaluationAsync(ClientAnswer clientAnswer) {
-        return CompletableFuture.completedFuture(communicateService.withEvaluationServer(clientAnswer.answer()));
     }
 
     private void addChatMessage(ChatRequest chatRequest, String role, String message) {
