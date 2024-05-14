@@ -36,6 +36,8 @@ public enum CustomResponseStatus {
     GPT_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4004", "GPT가 응답하지 않습니다."),
     MAP_VALUE_NOT_EXIST(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4005", "채팅이 존재하지 않습니다. 채팅을 새롭게 시작해주세요."),
     EVALUATION_SERVER_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4006", "평가서버가 응답하지 않습니다."),
+    CS_CHAT_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4007", "해당 CS 채팅이 존재하지 않습니다."),
+    SELF_INTRO_CHAT_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4008", "해당 자기소개서 채팅이 존재하지 않습니다."),
 
     /***
      * 5000: NOT_MATCH
