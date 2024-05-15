@@ -61,7 +61,6 @@ public class ApiResponse<T> {
      * @return : data 없이 ApiResponse 를 반환한다.
      */
     public static ApiResponse<String> createError(CustomResponseStatus status) {
-        return new ApiResponse<>(status.getHttpStatusCode(), status.getMessage(), status.getCode(), null);
-
+        return new ApiResponse<>(status.getHttpStatusCode(), status.getCode(), status.getMessage(), null);
     }
 }
