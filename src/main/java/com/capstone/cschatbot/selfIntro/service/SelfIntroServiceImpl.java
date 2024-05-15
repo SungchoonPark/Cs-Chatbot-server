@@ -95,8 +95,7 @@ public class SelfIntroServiceImpl implements SelfIntroService{
 
     @Override
     public SelfIntroList findAllSelfIntro(String memberId) {
-        // TODO : 해당 memberId 를 조건에 넣어야함
-        List<SelfIntro> selfIntros = selfIntroRepository.findAllByMemberId(memberId);
+        List<SelfIntro> selfIntros = selfIntroRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
         return SelfIntroList.builder()
                 .selfIntros(selfIntros)
                 .build();
@@ -108,7 +107,7 @@ public class SelfIntroServiceImpl implements SelfIntroService{
                 .orElseThrow(() -> new CustomException(CustomResponseStatus.SELF_INTRO_CHAT_NOT_FOUND));
 
         return SelfIntroDetail.builder()
-                .selfIntro(selfIntro)
+                .selfIntroChats(selfIntro.getSelfIntroChats())
                 .build();
     }
 

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SelfIntroRepository extends MongoRepository<SelfIntro, String> {
 
-    List<SelfIntro> findAllByMemberId(String memberId);
+    List<SelfIntro> findAllByMemberIdAndTerminateStatusTrue(String memberId);
 }
