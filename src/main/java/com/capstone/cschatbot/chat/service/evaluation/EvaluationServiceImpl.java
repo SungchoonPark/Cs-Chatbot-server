@@ -33,7 +33,6 @@ public class EvaluationServiceImpl implements EvaluationService{
     @Override
     @Async
     public CompletableFuture<ChatEvaluation> getEvaluation(String question, String clientAnswer) {
-        log.info("[평가 서버 요청 들어왔음!!!!]");
         URI uri = UriComponentsBuilder
                 .fromUriString(evaluationUrl)
                 .queryParam("question", question)
@@ -44,9 +43,9 @@ public class EvaluationServiceImpl implements EvaluationService{
 
         Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
         checkValidEvaluationResponse(evaluation);
-        log.info("평가 : {}", evaluation.getEvaluation());
+        log.info("평가 : {}", evaluation);
 
-        return CompletableFuture.completedFuture(ChatEvaluation.of(question, clientAnswer, evaluation));
+        return CompletableFuture.completedFuture(ChatEvaluation.of(question, clientAnswer, evaluation.getEvaluation()));
     }
 
     private void checkValidEvaluationResponse(Evaluation evaluation) {

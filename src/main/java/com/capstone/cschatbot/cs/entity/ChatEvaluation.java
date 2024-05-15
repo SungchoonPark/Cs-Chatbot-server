@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class ChatEvaluation {
     private String question;
     private String answer;
-    private Evaluation evaluation;
+    private String evaluation;
 
-    public static ChatEvaluation of(String question, String answer, Evaluation evaluation) {
+    public static ChatEvaluation of(String question, String answer, String evaluation) {
         return new ChatEvaluation(question, answer, evaluation);
     }
 }
