@@ -57,10 +57,20 @@ public class CSController {
     }
 
     @GetMapping("/chats/cs")
-    public ResponseEntity<ApiResponse<CSChatHistoryList>> findAllCSChat(
+    public ResponseEntity<ApiResponse<CSChatHistoryList>> getAllCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         CSChatHistoryList response = csService.findAllCSChat(principalDetails.getMemberId());
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
+
+    @GetMapping("/cs/{chatId}")
+    public ResponseEntity<ApiResponse<CSChatHistory>> getCSChat(
+            @PathVariable String chatId
+    ) {
+        CSChatHistory response = csService.findCSChat(chatId);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
+
+
 }

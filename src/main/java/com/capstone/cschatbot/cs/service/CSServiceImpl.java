@@ -115,7 +115,7 @@ public class CSServiceImpl implements CSService {
             memberCSChatMap.remove(memberId);
 
             return CSChatHistory.builder()
-                    .csChat(save)
+                    .chatEvaluations(save.getChatHistory())
                     .build();
         }).join();
     }
@@ -125,6 +125,15 @@ public class CSServiceImpl implements CSService {
         List<CSChat> csChats = csChatRepository.findAllByMemberId(memberId);
         return CSChatHistoryList.builder()
                 .csChats(csChats)
+                .build();
+    }
+
+    @Override
+    public CSChatHistory findCSChat(String chatRoomId) {
+        CSChat csChat = csChatRepository.findById(chatRoomId)
+                .orElseThrow(() -> new CustomException(CustomResponseStatus.SELF_INTRO_CHAT_NOT_FOUND));
+        return CSChatHistory.builder()
+                .chatEvaluations(csChat.getChatHistory())
                 .build();
     }
 
