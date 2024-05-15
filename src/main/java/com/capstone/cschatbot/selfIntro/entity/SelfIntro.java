@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity;
+package com.capstone.cschatbot.selfIntro.entity;
 
 import jakarta.persistence.Id;
 import lombok.AccessLevel;

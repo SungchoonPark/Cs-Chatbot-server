@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.dto.request;
+package com.capstone.cschatbot.selfIntro.dto.request;
 
 public record SelfIntroChatRequest(String question, String content) {
 }

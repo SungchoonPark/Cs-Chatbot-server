@@ -1,7 +1,7 @@
 package com.capstone.cschatbot.chat.service.evaluation;
 
-import com.capstone.cschatbot.chat.entity.ChatEvaluation;
-import com.capstone.cschatbot.chat.entity.Evaluation;
+import com.capstone.cschatbot.cs.entity.ChatEvaluation;
+import com.capstone.cschatbot.chat.entity.evaluation.Evaluation;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 

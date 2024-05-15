@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.dto.response;
+package com.capstone.cschatbot.selfIntro.dto.response;
 
 import lombok.Builder;
 

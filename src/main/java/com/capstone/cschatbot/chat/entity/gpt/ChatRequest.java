@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity;
+package com.capstone.cschatbot.chat.entity.gpt;
 
 import lombok.Getter;
 

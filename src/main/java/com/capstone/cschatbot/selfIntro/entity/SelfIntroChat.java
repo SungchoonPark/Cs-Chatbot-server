@@ -1,8 +1,7 @@
-package com.capstone.cschatbot.chat.entity;
+package com.capstone.cschatbot.selfIntro.entity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter

@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.chat.util;
 
-import com.capstone.cschatbot.chat.dto.request.SelfIntroChatRequest;
+import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatRequest;
 import org.springframework.stereotype.Component;
 
 @Component
