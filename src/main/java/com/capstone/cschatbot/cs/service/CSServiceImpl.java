@@ -111,6 +111,7 @@ public class CSServiceImpl implements CSService {
             evaluations.forEach(e -> e.thenAccept(chatEvaluations::add));
 
             csChat.updateChatHistory(chatEvaluations);
+            csChat.terminateCsChat();
             CSChat save = csChatRepository.save(csChat);
             memberCSChatMap.remove(memberId);
 
@@ -122,7 +123,15 @@ public class CSServiceImpl implements CSService {
 
     @Override
     public CSChatHistoryList findAllCSChat(String memberId) {
-        List<CSChat> csChats = csChatRepository.findAllByMemberId(memberId);
+        List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
+        return CSChatHistoryList.builder()
+                .csChats(csChats)
+                .build();
+    }
+
+    @Override
+    public CSChatHistoryList findAllCSChatByTopic(String memberId, String topic) {
+        List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTopicEqualsAndTerminateStatusTrue(memberId, topic);
         return CSChatHistoryList.builder()
                 .csChats(csChats)
                 .build();

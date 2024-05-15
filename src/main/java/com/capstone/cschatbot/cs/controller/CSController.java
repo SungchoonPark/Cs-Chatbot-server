@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.*;
 public class CSController {
     private final CSService csService;
     // CS 첫 채팅 API
-    @GetMapping("/initial/chat/cs")
+    @GetMapping("/initial/chat/cs/{topic}")
     public ResponseEntity<ApiResponse<QuestionAndChatId>> initiateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam("topic") String topic) {
+            @PathVariable String topic) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
                 csService.initiateCSChat(principalDetails.getMemberId(), topic),
@@ -61,6 +61,15 @@ public class CSController {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         CSChatHistoryList response = csService.findAllCSChat(principalDetails.getMemberId());
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
+
+    @GetMapping("/chats/cs/{topic}")
+    public ResponseEntity<ApiResponse<CSChatHistoryList>> getAllCSChatByTopic(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable String topic
+    ) {
+        CSChatHistoryList response = csService.findAllCSChatByTopic(principalDetails.getMemberId(), topic);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 

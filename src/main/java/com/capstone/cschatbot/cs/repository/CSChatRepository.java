@@ -6,5 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface CSChatRepository extends MongoRepository<CSChat, String> {
-    List<CSChat> findAllByMemberId(String memberId);
+    List<CSChat> findAllByMemberIdAndTerminateStatusTrue(String memberId);
+    List<CSChat> findAllByMemberIdAndTopicEqualsAndTerminateStatusTrue(String memberId, String topic);
 }
