@@ -10,6 +10,7 @@ import com.capstone.cschatbot.chat.service.evaluation.EvaluationService;
 import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
+import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.entity.CSChat;
 import com.capstone.cschatbot.cs.entity.ChatEvaluation;
@@ -34,7 +35,7 @@ public class CSServiceImpl implements CSService {
 
     private final ChatUtil chatUtil;
 
-    private final GPTService gPTService;
+    private final GPTService gptService;
 
     private final EvaluationService evaluationService;
 
@@ -54,7 +55,12 @@ public class CSServiceImpl implements CSService {
 
         memberEvaluations.put(memberId, new LinkedList<>());
         ChatRequest chatRequest = ChatRequest.of(model, 1, 256, 1, 0, 0);
-        addChatMessage(chatRequest, GPTRoleType.SYSTEM.getRole(), chatUtil.createCSInitialPrompt(topic));
+
+        addChatMessage(
+                chatRequest,
+                GPTRoleType.SYSTEM.getRole(),
+                chatUtil.createCSInitialPrompt(topic)
+        );
 
         return initiateCSChatWithGPT(memberId, chatRequest, topic);
     }
@@ -70,7 +76,7 @@ public class CSServiceImpl implements CSService {
         String answer = clientAnswer.answer();
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
 
-        String newQuestion = gPTService.getNewQuestion(chatRequest);
+        String newQuestion = gptService.getNewQuestion(chatRequest);
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
 
         for (Message message : chatRequest.getMessages()) {
@@ -87,7 +93,7 @@ public class CSServiceImpl implements CSService {
     }
 
     @Override
-    public void terminateCSChat(String memberId, String chatId) {
+    public CSChatHistory terminateCSChat(String memberId, String chatId) {
         if (!memberCSChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
         }
@@ -95,31 +101,28 @@ public class CSServiceImpl implements CSService {
 
         List<ChatEvaluation> chatEvaluations = new ArrayList<>();
         CompletableFuture<Void> allOfFuture = CompletableFuture.allOf(evaluations.toArray(new CompletableFuture[0]));
-        log.info("id : {}", chatId);
 
-        CSChat CSChat = csChatRepository.findById(chatId)
+        CSChat csChat = csChatRepository.findById(chatId)
                 .orElseThrow(() -> new CustomException(CustomResponseStatus.CS_CHAT_NOT_FOUND));
 
-        allOfFuture.thenRun(() -> {
+        return allOfFuture.thenApply(v -> {
             log.info("[평가 끝] 모든 비동기 요청 작업 종료");
-            for (CompletableFuture<ChatEvaluation> evaluation : evaluations) {
-                evaluation.thenAccept(chatEvaluation -> {
-                    log.info("질문 : {}", chatEvaluation.getQuestion());
-                    log.info("답변 : {}", chatEvaluation.getAnswer());
-                    log.info("평가 결과: {}", chatEvaluation.getEvaluation().getEvaluation());
-                    chatEvaluations.add(chatEvaluation);
-                });
-            }
-            CSChat.updateChatHistory(chatEvaluations);
-            csChatRepository.save(CSChat);
+            evaluations.forEach(e -> e.thenAccept(chatEvaluations::add));
+
+            csChat.updateChatHistory(chatEvaluations);
+            CSChat save = csChatRepository.save(csChat);
             memberCSChatMap.remove(memberId);
-        });
+
+            return CSChatHistory.builder()
+                    .csChat(save)
+                    .build();
+        }).join();
     }
 
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
 
-        String question = gPTService.getNewQuestion(chatRequest);
+        String question = gptService.getNewQuestion(chatRequest);
 
         addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), question);
         memberCSChatMap.put(memberId, chatRequest);

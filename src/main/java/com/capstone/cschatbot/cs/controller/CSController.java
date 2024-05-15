@@ -5,6 +5,7 @@ import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.config.security.service.PrincipalDetails;
+import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.service.CSService;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +46,12 @@ public class CSController {
     }
 
     // CS 채팅 종료
-    // TODO : 여기선 평가 정보를 보여줘야 함.
     @PostMapping("/end/chat/cs/{chatId}")
-    public ResponseEntity<ApiResponse<String>> terminateCSChat(
+    public ResponseEntity<ApiResponse<CSChatHistory>> terminateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable String chatId
     ) {
-        csService.terminateCSChat(principalDetails.getMemberId(), chatId);
-        return ResponseEntity.ok().body(ApiResponse.createSuccess("채팅이 종료되었습니다.", CustomResponseStatus.SUCCESS));
+        CSChatHistory response = csService.terminateCSChat(principalDetails.getMemberId(), chatId);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 }
