@@ -11,6 +11,7 @@ import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
+import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.entity.CSChat;
 import com.capstone.cschatbot.cs.entity.ChatEvaluation;
@@ -117,6 +118,14 @@ public class CSServiceImpl implements CSService {
                     .csChat(save)
                     .build();
         }).join();
+    }
+
+    @Override
+    public CSChatHistoryList findAllCSChat(String memberId) {
+        List<CSChat> csChats = csChatRepository.findAllByMemberId(memberId);
+        return CSChatHistoryList.builder()
+                .csChats(csChats)
+                .build();
     }
 
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {

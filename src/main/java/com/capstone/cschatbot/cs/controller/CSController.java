@@ -6,6 +6,7 @@ import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.config.security.service.PrincipalDetails;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
+import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.service.CSService;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,14 @@ public class CSController {
             @PathVariable String chatId
     ) {
         CSChatHistory response = csService.terminateCSChat(principalDetails.getMemberId(), chatId);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
+    }
+
+    @GetMapping("/chats/cs")
+    public ResponseEntity<ApiResponse<CSChatHistoryList>> findAllCSChat(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        CSChatHistoryList response = csService.findAllCSChat(principalDetails.getMemberId());
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 }
