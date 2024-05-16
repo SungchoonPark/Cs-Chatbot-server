@@ -29,7 +29,6 @@ public class EvaluationServiceImpl implements EvaluationService{
     @Autowired
     private final RestTemplate evaluationRestTemplate;
 
-    // TODO : 질문과 답변을 같이 보내줘서 평가를 받아오게 바꾸기
     @Override
     @Async
     public CompletableFuture<ChatEvaluation> getEvaluation(String question, String clientAnswer) {
