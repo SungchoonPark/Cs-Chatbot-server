@@ -29,6 +29,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class CSServiceImpl implements CSService {
+    private enum ValidationType {
+        MUST_NOT_EXIST,
+        MUST_EXIST
+    }
     private static final String INITIAL_USER_MESSAGE = "안녕하십니까. 잘 부탁드립니다.";
 
     @Value("${openai.model}")
@@ -41,52 +45,33 @@ public class CSServiceImpl implements CSService {
     private final EvaluationService evaluationService;
 
     private final CSChatRepository csChatRepository;
-
     private final Map<String, ChatRequest> memberCSChatMap = new HashMap<>();
     private final Map<String, List<CompletableFuture<ChatEvaluation>>> memberEvaluations = new ConcurrentHashMap<>();
 
     @Override
     public QuestionAndChatId initiateCSChat(String memberId, String topic) {
-        if (memberCSChatMap.containsKey(memberId)) {
-            throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
-        }
-        if (memberEvaluations.containsKey(memberId)) {
-            throw new CustomException((CustomResponseStatus.ALREADY_EVALUATION_MAP_EXIST));
-        }
+        validateMember(memberId, ValidationType.MUST_NOT_EXIST);
 
         memberEvaluations.put(memberId, new LinkedList<>());
         ChatRequest chatRequest = ChatRequest.of(model, 1, 256, 1, 0, 0);
-
-        addChatMessage(
-                chatRequest,
-                GPTRoleType.SYSTEM.getRole(),
-                chatUtil.createCSInitialPrompt(topic)
-        );
+        addChatMessage(chatRequest, GPTRoleType.SYSTEM.getRole(), chatUtil.createCSInitialPrompt(topic));
 
         return initiateCSChatWithGPT(memberId, chatRequest, topic);
     }
 
     @Override
     public NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer) {
-        if (!memberCSChatMap.containsKey(memberId)) {
-            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-        }
+        validateMember(memberId, ValidationType.MUST_EXIST);
 
         ChatRequest chatRequest = memberCSChatMap.get(memberId);
         String question = chatRequest.getMessages().get(chatRequest.getMessages().size() - 1).getContent();
         String answer = clientAnswer.answer();
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
 
-        String newQuestion = gptService.getNewQuestion(chatRequest);
-        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
+        String newQuestion = generateAndAddNewQuestion(chatRequest);
 
-        for (Message message : chatRequest.getMessages()) {
-            log.info("role = " + message.getRole() + ", message = " + message.getContent());
-        }
-
-        final CompletableFuture<ChatEvaluation> chatEvaluationFuture = evaluationService.getEvaluation(question, answer);
-        List<CompletableFuture<ChatEvaluation>> completableFutures = memberEvaluations.computeIfAbsent(memberId, k -> new ArrayList<>());
-        completableFutures.add(chatEvaluationFuture);
+        logChatMessage(chatRequest);
+        addEvaluationToMember(memberId, question, answer);
 
         return NewQuestion.builder()
                 .question(newQuestion)
@@ -95,9 +80,8 @@ public class CSServiceImpl implements CSService {
 
     @Override
     public CSChatHistory terminateCSChat(String memberId, String chatId) {
-        if (!memberCSChatMap.containsKey(memberId)) {
-            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-        }
+        validateMember(memberId, ValidationType.MUST_EXIST);
+
         List<CompletableFuture<ChatEvaluation>> evaluations = memberEvaluations.remove(memberId);
 
         List<ChatEvaluation> chatEvaluations = new ArrayList<>();
@@ -149,9 +133,7 @@ public class CSServiceImpl implements CSService {
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
 
-        String question = gptService.getNewQuestion(chatRequest);
-
-        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), question);
+        String question = generateAndAddNewQuestion(chatRequest);
         memberCSChatMap.put(memberId, chatRequest);
 
         CSChat saveCSChat = csChatRepository.save(CSChat.of(memberId, topic));
@@ -162,8 +144,44 @@ public class CSServiceImpl implements CSService {
                 .build();
     }
 
+    private String generateAndAddNewQuestion(ChatRequest chatRequest) {
+        String newQuestion = gptService.getNewQuestion(chatRequest);
+        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
+        return newQuestion;
+    }
+
     private void addChatMessage(ChatRequest chatRequest, String role, String message) {
         chatRequest.addMessage(role, message);
     }
 
+    private void addEvaluationToMember(String memberId, String question, String answer) {
+        final CompletableFuture<ChatEvaluation> chatEvaluationFuture = evaluationService.getEvaluation(question, answer);
+        List<CompletableFuture<ChatEvaluation>> completableFutures = memberEvaluations.computeIfAbsent(memberId, k -> new ArrayList<>());
+        completableFutures.add(chatEvaluationFuture);
+    }
+
+    private static void logChatMessage(ChatRequest chatRequest) {
+        for (Message message : chatRequest.getMessages()) {
+            log.info("role = " + message.getRole() + ", message = " + message.getContent());
+        }
+    }
+
+    private void validateMember(String memberId, ValidationType validationType) {
+        boolean exists = memberCSChatMap.containsKey(memberId);
+        switch (validationType) {
+            case MUST_NOT_EXIST:
+                if (exists) {
+                    throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
+                }
+                if (memberEvaluations.containsKey(memberId)) {
+                    throw new CustomException(CustomResponseStatus.ALREADY_EVALUATION_MAP_EXIST);
+                }
+                break;
+            case MUST_EXIST:
+                if (!exists) {
+                    throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
+                }
+                break;
+        }
+    }
 }
