@@ -10,7 +10,4 @@ public interface CSService {
     QuestionAndChatId initiateCSChat(String memberId, String topic);
     NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer);
     CSChatHistory terminateCSChat(String memberId, String chatRoomId);
-    CSChatHistoryList findAllCSChat(String memberId);
-    CSChatHistoryList findAllCSChatByTopic(String memberId, String topic);
-    CSChatHistory findCSChat(String chatRoomId);
 }

@@ -105,31 +105,6 @@ public class CSServiceImpl implements CSService {
         }).join();
     }
 
-    @Override
-    public CSChatHistoryList findAllCSChat(String memberId) {
-        List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
-        return CSChatHistoryList.builder()
-                .csChats(csChats)
-                .build();
-    }
-
-    @Override
-    public CSChatHistoryList findAllCSChatByTopic(String memberId, String topic) {
-        List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTopicEqualsAndTerminateStatusTrue(memberId, topic);
-        return CSChatHistoryList.builder()
-                .csChats(csChats)
-                .build();
-    }
-
-    @Override
-    public CSChatHistory findCSChat(String chatRoomId) {
-        CSChat csChat = csChatRepository.findById(chatRoomId)
-                .orElseThrow(() -> new CustomException(CustomResponseStatus.SELF_INTRO_CHAT_NOT_FOUND));
-        return CSChatHistory.builder()
-                .chatEvaluations(csChat.getChatHistory())
-                .build();
-    }
-
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {
         addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
 
