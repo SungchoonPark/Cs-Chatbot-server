@@ -1,6 +1,5 @@
-package com.capstone.cschatbot.cs.entity;
+package com.capstone.cschatbot.cs.domain;
 
-import com.capstone.cschatbot.chat.entity.evaluation.Evaluation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

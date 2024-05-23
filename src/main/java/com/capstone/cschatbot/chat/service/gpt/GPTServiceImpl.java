@@ -1,7 +1,7 @@
 package com.capstone.cschatbot.chat.service.gpt;
 
-import com.capstone.cschatbot.chat.entity.gpt.ChatRequest;
-import com.capstone.cschatbot.chat.entity.gpt.ChatResponse;
+import com.capstone.cschatbot.chat.domain.gpt.ChatRequest;
+import com.capstone.cschatbot.chat.domain.gpt.ChatResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,12 @@
 package com.capstone.cschatbot.selfIntro.service;
 
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
-import com.capstone.cschatbot.chat.entity.enums.ValidationType;
+import com.capstone.cschatbot.chat.domain.enums.ValidationType;
 import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatRequest;
 import com.capstone.cschatbot.selfIntro.dto.response.NewQuestionAndGrade;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
-import com.capstone.cschatbot.chat.entity.gpt.ChatRequest;
-import com.capstone.cschatbot.chat.entity.enums.GPTRoleType;
+import com.capstone.cschatbot.chat.domain.gpt.ChatRequest;
+import com.capstone.cschatbot.chat.domain.enums.GPTRoleType;
 import com.capstone.cschatbot.chat.service.gpt.GPTService;
 import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;

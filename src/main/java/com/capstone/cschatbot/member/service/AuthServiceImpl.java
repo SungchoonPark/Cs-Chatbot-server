@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.member.service;
 
-import com.capstone.cschatbot.common.entity.AuthTokens;
+import com.capstone.cschatbot.common.domain.AuthTokens;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.config.jwt.util.AuthTokenGenerator;

@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity.enums;
+package com.capstone.cschatbot.chat.domain.enums;
 
 import lombok.Getter;
 

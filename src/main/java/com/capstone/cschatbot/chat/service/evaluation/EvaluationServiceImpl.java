@@ -1,7 +1,7 @@
 package com.capstone.cschatbot.chat.service.evaluation;
 
-import com.capstone.cschatbot.cs.entity.ChatEvaluation;
-import com.capstone.cschatbot.chat.entity.evaluation.Evaluation;
+import com.capstone.cschatbot.cs.domain.ChatEvaluation;
+import com.capstone.cschatbot.chat.domain.evaluation.Evaluation;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;

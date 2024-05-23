@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.member.entity;
 
-import com.capstone.cschatbot.common.entity.BaseEntity;
+import com.capstone.cschatbot.common.domain.BaseEntity;
 import com.capstone.cschatbot.common.enums.BaseStatus;
 import com.capstone.cschatbot.config.oauth.OauthInfo;
 import com.capstone.cschatbot.member.entity.enums.Role;

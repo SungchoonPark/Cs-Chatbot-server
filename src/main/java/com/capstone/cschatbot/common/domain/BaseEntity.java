@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.common.entity;
+package com.capstone.cschatbot.common.domain;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

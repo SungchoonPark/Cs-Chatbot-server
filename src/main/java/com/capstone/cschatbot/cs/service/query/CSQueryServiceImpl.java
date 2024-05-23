@@ -4,7 +4,7 @@ import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
-import com.capstone.cschatbot.cs.entity.CSChat;
+import com.capstone.cschatbot.cs.domain.CSChat;
 import com.capstone.cschatbot.cs.repository.CSChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

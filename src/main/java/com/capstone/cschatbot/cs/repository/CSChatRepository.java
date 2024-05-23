@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.cs.repository;
 
-import com.capstone.cschatbot.cs.entity.CSChat;
+import com.capstone.cschatbot.cs.domain.CSChat;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
