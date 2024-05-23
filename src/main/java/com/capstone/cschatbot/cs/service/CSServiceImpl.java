@@ -2,6 +2,7 @@ package com.capstone.cschatbot.cs.service;
 
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
+import com.capstone.cschatbot.chat.entity.enums.ValidationType;
 import com.capstone.cschatbot.chat.entity.gpt.ChatRequest;
 import com.capstone.cschatbot.chat.entity.enums.GPTRoleType;
 import com.capstone.cschatbot.chat.service.gpt.GPTService;
@@ -27,11 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class CSServiceImpl implements CSService {
-    private enum ValidationType {
-        MUST_NOT_EXIST,
-        MUST_EXIST
-    }
-
     private static final String INITIAL_USER_MESSAGE = "안녕하십니까. 잘 부탁드립니다.";
 
     private final ChatUtil chatUtil;
@@ -80,7 +76,13 @@ public class CSServiceImpl implements CSService {
         validAccumulatedEvaluations(accumulatedEvaluationsWithAsync);
 
         CompletableFuture<Void> allEvaluationsFuture = CompletableFuture.allOf(accumulatedEvaluationsWithAsync.toArray(new CompletableFuture[0]));
-        return completeEvaluationsAndTerminateChat(allEvaluationsFuture, accumulatedEvaluationsWithAsync, chatId, memberId);
+
+        return completeEvaluationsAndTerminateChat(
+                allEvaluationsFuture,
+                accumulatedEvaluationsWithAsync,
+                chatId,
+                memberId
+        );
     }
 
     private CSChatHistory completeEvaluationsAndTerminateChat(
@@ -99,8 +101,6 @@ public class CSServiceImpl implements CSService {
         List<ChatEvaluation> chatEvaluations = accumulatedEvaluationsWithAsync.stream()
                 .map(CompletableFuture::join)
                 .toList();
-
-        log.info("[평가 끝] 모든 비동기 요청 작업 종료");
 
         CSChat csChat = findCSChatByChatId(chatId);
         csChat.terminateProcess(chatEvaluations);

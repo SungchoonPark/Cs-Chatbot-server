@@ -10,6 +10,7 @@ import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.config.security.service.PrincipalDetails;
 import com.capstone.cschatbot.selfIntro.service.SelfIntroService;
+import com.capstone.cschatbot.selfIntro.service.query.SelfIntroQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/member")
 public class SelfIntroController {
     private final SelfIntroService selfIntroService;
+    private final SelfIntroQueryService selfIntroQueryService;
 
     // 자소서 채팅 시작
     @GetMapping("/initial/chat/self_intro")
@@ -63,7 +65,7 @@ public class SelfIntroController {
     public ResponseEntity<ApiResponse<SelfIntroList>> getAllSelfIntroChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        SelfIntroList response = selfIntroService.findAllSelfIntro(principalDetails.getMemberId());
+        SelfIntroList response = selfIntroQueryService.findAllSelfIntro(principalDetails.getMemberId());
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
@@ -71,7 +73,7 @@ public class SelfIntroController {
     public ResponseEntity<ApiResponse<SelfIntroDetail>> getSelfIntroChat(
             @PathVariable String chatId
     ) {
-        SelfIntroDetail response = selfIntroService.findSelfIntro(chatId);
+        SelfIntroDetail response = selfIntroQueryService.findSelfIntro(chatId);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 }
