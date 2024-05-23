@@ -1,28 +1,25 @@
 package com.capstone.cschatbot.member.entity;
 
-import com.capstone.cschatbot.common.entity.BaseEntity;
+import com.capstone.cschatbot.common.domain.BaseEntity;
 import com.capstone.cschatbot.common.enums.BaseStatus;
 import com.capstone.cschatbot.config.oauth.OauthInfo;
 import com.capstone.cschatbot.member.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "member")
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Embedded
+    @Id
+    private String id;
     private OauthInfo oauthInfo;
-
-    @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Enumerated(EnumType.STRING)
     private BaseStatus memberStatus;
 
     private Member(OauthInfo oauthInfo) {

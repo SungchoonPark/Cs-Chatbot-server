@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity.gpt;
+package com.capstone.cschatbot.chat.domain.gpt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

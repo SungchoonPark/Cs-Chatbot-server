@@ -9,6 +9,7 @@ import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.service.CSService;
+import com.capstone.cschatbot.cs.service.query.CSQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class CSController {
     private final CSService csService;
+    private final CSQueryService csQueryService;
     // CS 첫 채팅 API
     @GetMapping("/initial/chat/cs/{topic}")
     public ResponseEntity<ApiResponse<QuestionAndChatId>> initiateCSChat(
@@ -60,7 +62,7 @@ public class CSController {
     public ResponseEntity<ApiResponse<CSChatHistoryList>> getAllCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        CSChatHistoryList response = csService.findAllCSChat(principalDetails.getMemberId());
+        CSChatHistoryList response = csQueryService.findAllCSChat(principalDetails.getMemberId());
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
@@ -69,7 +71,7 @@ public class CSController {
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable String topic
     ) {
-        CSChatHistoryList response = csService.findAllCSChatByTopic(principalDetails.getMemberId(), topic);
+        CSChatHistoryList response = csQueryService.findAllCSChatByTopic(principalDetails.getMemberId(), topic);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
@@ -77,7 +79,7 @@ public class CSController {
     public ResponseEntity<ApiResponse<CSChatHistory>> getCSChat(
             @PathVariable String chatId
     ) {
-        CSChatHistory response = csService.findCSChat(chatId);
+        CSChatHistory response = csQueryService.findCSChat(chatId);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 

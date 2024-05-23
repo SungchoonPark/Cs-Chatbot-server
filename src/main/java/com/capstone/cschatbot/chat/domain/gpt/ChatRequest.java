@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity.gpt;
+package com.capstone.cschatbot.chat.domain.gpt;
 
 import lombok.Getter;
 
@@ -25,12 +25,20 @@ public class ChatRequest {
         this.presence_penalty = presencePenalty;
     }
 
+    public static ChatRequest createDefault() {
+        return new ChatRequest("gpt-3.5-turbo", 1, 256, 1, 0, 0);
+    }
+
     public static ChatRequest of(String model, int temperature, int maxTokens, int topP, int frequencyPenalty, int presencePenalty) {
         return new ChatRequest(model, temperature, maxTokens, topP, frequencyPenalty, presencePenalty);
     }
 
     public void addMessage(String role, String responseContent) {
         this.messages.add(new Message(role, responseContent));
+    }
+
+    public String findRecentQuestion() {
+        return messages.get(messages.size() - 1).getContent();
     }
 }
 

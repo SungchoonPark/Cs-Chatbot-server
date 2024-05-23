@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.chat.service.evaluation;
 
-import com.capstone.cschatbot.cs.entity.ChatEvaluation;
+import com.capstone.cschatbot.cs.domain.ChatEvaluation;
 
 import java.util.concurrent.CompletableFuture;
 

@@ -11,7 +11,5 @@ public interface SelfIntroService {
     QuestionAndChatId initiateSelfIntroChat(String memberId, SelfIntroChatRequest chat);
     NewQuestionAndGrade processSelfIntroChat(String memberId, ClientAnswer clientAnswer, String chatRoomId);
     void terminateSelfIntroChat(String memberId, String chatRoomId);
-    SelfIntroList findAllSelfIntro(String memberId);
-    SelfIntroDetail findSelfIntro(String chatRoomId);
 
 }

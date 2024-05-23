@@ -1,7 +1,7 @@
 package com.capstone.cschatbot.chat.service.evaluation;
 
-import com.capstone.cschatbot.cs.entity.ChatEvaluation;
-import com.capstone.cschatbot.chat.entity.evaluation.Evaluation;
+import com.capstone.cschatbot.cs.domain.ChatEvaluation;
+import com.capstone.cschatbot.chat.domain.evaluation.Evaluation;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class EvaluationServiceImpl implements EvaluationService{
 
         Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
         checkValidEvaluationResponse(evaluation);
-        log.info("평가 : {}", evaluation);
+        log.info("평가 : {}", evaluation.getEvaluation());
 
         return CompletableFuture.completedFuture(ChatEvaluation.of(question, clientAnswer, evaluation.getEvaluation()));
     }

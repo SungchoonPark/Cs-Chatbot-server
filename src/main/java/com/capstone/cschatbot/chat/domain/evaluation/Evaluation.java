@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.entity.evaluation;
+package com.capstone.cschatbot.chat.domain.evaluation;
 
 import lombok.Getter;
 

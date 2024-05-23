@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.member.dto;
 
-import com.capstone.cschatbot.common.entity.AuthTokens;
+import com.capstone.cschatbot.common.domain.AuthTokens;
 import lombok.*;
 
 public class MemberDto {
