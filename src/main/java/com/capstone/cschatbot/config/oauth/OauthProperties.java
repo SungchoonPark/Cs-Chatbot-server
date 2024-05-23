@@ -24,9 +24,6 @@ public class OauthProperties {
     @Setter
     public static class OauthSecret {
         private String baseUrl;
-//        private String clientId;
-//        private String clientSecret;
-//        private String redirectUrl;
         private String appId;
         private String adminKey;
     }
@@ -34,18 +31,6 @@ public class OauthProperties {
     public String getKakaoBaseUrl() {
         return kakao.getBaseUrl();
     }
-
-//    public String getKakaoClientId() {
-//        return kakao.getClientId();
-//    }
-//
-//    public String getKakaoClientSecret() {
-//        return kakao.getClientSecret();
-//    }
-//
-//    public String getKakaoRedirectUrl() {
-//        return kakao.getRedirectUrl();
-//    }
 
     public String getKakaoAppId() {
         return kakao.getAppId();

@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         return SignIn.builder()
                 .authTokens(
                         authTokenGenerator.generate(
-                                findMember.getId().toString(),
+                                findMember.getId(),
                                 getOrGenerateRefreshToken(findMember)
                         )
                 )
@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = redisUtil.getData(RT + findMember.getId());
 
         if (refreshToken == null) {
-            refreshToken = jwtUtil.createToken(findMember.getId().toString(), TokenType.REFRESH_TOKEN);
+            refreshToken = jwtUtil.createToken(findMember.getId(), TokenType.REFRESH_TOKEN);
             redisUtil.setData(RT + findMember.getId(), refreshToken, jwtUtil.getExpiration(TokenType.REFRESH_TOKEN));
         }
 
