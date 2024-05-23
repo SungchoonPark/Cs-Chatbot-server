@@ -42,7 +42,7 @@ public class EvaluationServiceImpl implements EvaluationService{
 
         Evaluation evaluation = evaluationRestTemplate.getForObject(uri, Evaluation.class);
         checkValidEvaluationResponse(evaluation);
-        log.info("평가 : {}", evaluation);
+        log.info("평가 : {}", evaluation.getEvaluation());
 
         return CompletableFuture.completedFuture(ChatEvaluation.of(question, clientAnswer, evaluation.getEvaluation()));
     }

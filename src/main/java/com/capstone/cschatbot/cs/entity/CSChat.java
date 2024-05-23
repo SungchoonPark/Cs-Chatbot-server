@@ -35,11 +35,16 @@ public class CSChat {
         return new CSChat(memberId, topic);
     }
 
-    public void updateChatHistory(List<ChatEvaluation> evaluations) {
+    public void terminateProcess(List<ChatEvaluation> evaluations) {
+        updateChatHistory(evaluations);
+        terminateCsChat();
+    }
+
+    private void updateChatHistory(List<ChatEvaluation> evaluations) {
         this.chatHistory = evaluations;
     }
 
-    public void terminateCsChat() {
+    private void terminateCsChat() {
         this.terminateStatus = Boolean.TRUE;
     }
 }

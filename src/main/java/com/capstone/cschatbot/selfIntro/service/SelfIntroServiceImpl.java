@@ -30,9 +30,6 @@ public class SelfIntroServiceImpl implements SelfIntroService{
     private final ChatUtil chatUtil;
     private final SelfIntroRepository selfIntroRepository;
     private final GPTService gptService;
-
-    @Value("${openai.model}")
-    private String model;
     private final Map<String, ChatRequest> memberSelfIntroChatMap = new HashMap<>();
 
     @Override
@@ -41,7 +38,7 @@ public class SelfIntroServiceImpl implements SelfIntroService{
             throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
         }
 
-        ChatRequest chatRequest = ChatRequest.of(model, 1, 256, 1, 0, 0);
+        ChatRequest chatRequest = ChatRequest.createDefault();
         addChatMessage(chatRequest, GPTRoleType.SYSTEM.getRole(), chatUtil.createSelfIntroInitialPrompt(chat));
         return initiateSelfIntroChatWithGPT(memberId, chatRequest);
     }

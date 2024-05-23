@@ -3,7 +3,6 @@ package com.capstone.cschatbot.cs.service;
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.chat.entity.gpt.ChatRequest;
-import com.capstone.cschatbot.chat.entity.gpt.Message;
 import com.capstone.cschatbot.chat.entity.enums.GPTRoleType;
 import com.capstone.cschatbot.chat.service.gpt.GPTService;
 import com.capstone.cschatbot.chat.service.evaluation.EvaluationService;
@@ -11,18 +10,17 @@ import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
-import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.entity.CSChat;
 import com.capstone.cschatbot.cs.entity.ChatEvaluation;
 import com.capstone.cschatbot.cs.repository.CSChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -33,10 +31,8 @@ public class CSServiceImpl implements CSService {
         MUST_NOT_EXIST,
         MUST_EXIST
     }
-    private static final String INITIAL_USER_MESSAGE = "안녕하십니까. 잘 부탁드립니다.";
 
-    @Value("${openai.model}")
-    private String model;
+    private static final String INITIAL_USER_MESSAGE = "안녕하십니까. 잘 부탁드립니다.";
 
     private final ChatUtil chatUtil;
 
@@ -52,9 +48,10 @@ public class CSServiceImpl implements CSService {
     public QuestionAndChatId initiateCSChat(String memberId, String topic) {
         validateMember(memberId, ValidationType.MUST_NOT_EXIST);
 
-        memberEvaluations.put(memberId, new LinkedList<>());
-        ChatRequest chatRequest = ChatRequest.of(model, 1, 256, 1, 0, 0);
-        addChatMessage(chatRequest, GPTRoleType.SYSTEM.getRole(), chatUtil.createCSInitialPrompt(topic));
+        initializeMemberEvaluation(memberId);
+
+        ChatRequest chatRequest = ChatRequest.createDefault();
+        addSystemInitialPromptToChatMap(chatRequest, chatUtil.createCSInitialPrompt(topic));
 
         return initiateCSChatWithGPT(memberId, chatRequest, topic);
     }
@@ -63,18 +60,15 @@ public class CSServiceImpl implements CSService {
     public NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer) {
         validateMember(memberId, ValidationType.MUST_EXIST);
 
-        ChatRequest chatRequest = memberCSChatMap.get(memberId);
-        String question = chatRequest.getMessages().get(chatRequest.getMessages().size() - 1).getContent();
+        ChatRequest chatRequest = getChatRequestByMemberId(memberId);
+        String question = chatRequest.findRecentQuestion();
         String answer = clientAnswer.answer();
-        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), clientAnswer.answer());
 
-        String newQuestion = generateAndAddNewQuestion(chatRequest);
-
-        logChatMessage(chatRequest);
-        addEvaluationToMember(memberId, question, answer);
+        addEvaluationWithAsync(memberId, question, answer);
+        addMemberAnswerToChatMap(chatRequest, answer);
 
         return NewQuestion.builder()
-                .question(newQuestion)
+                .question(generateAndAddNewQuestion(chatRequest))
                 .build();
     }
 
@@ -82,31 +76,68 @@ public class CSServiceImpl implements CSService {
     public CSChatHistory terminateCSChat(String memberId, String chatId) {
         validateMember(memberId, ValidationType.MUST_EXIST);
 
-        List<CompletableFuture<ChatEvaluation>> evaluations = memberEvaluations.remove(memberId);
+        List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync = memberEvaluations.remove(memberId);
+        validAccumulatedEvaluations(accumulatedEvaluationsWithAsync);
 
-        List<ChatEvaluation> chatEvaluations = new ArrayList<>();
-        CompletableFuture<Void> allOfFuture = CompletableFuture.allOf(evaluations.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> allEvaluationsFuture = CompletableFuture.allOf(accumulatedEvaluationsWithAsync.toArray(new CompletableFuture[0]));
+        return completeEvaluationsAndTerminateChat(allEvaluationsFuture, accumulatedEvaluationsWithAsync, chatId, memberId);
+    }
 
-        CSChat csChat = csChatRepository.findById(chatId)
+    private CSChatHistory completeEvaluationsAndTerminateChat(
+            CompletableFuture<Void> allEvaluationsFuture,
+            List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync,
+            String chatId,
+            String memberId
+    ) {
+        try {
+            // 모든 비동기 작업이 끝나기를 기다리는 join() 메서드
+            allEvaluationsFuture.join();
+        } catch (CompletionException e) {
+            throw new CustomException(CustomResponseStatus.ASYNC_COMPLETION_ERROR);
+        }
+
+        List<ChatEvaluation> chatEvaluations = accumulatedEvaluationsWithAsync.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        log.info("[평가 끝] 모든 비동기 요청 작업 종료");
+
+        CSChat csChat = findCSChatByChatId(chatId);
+        csChat.terminateProcess(chatEvaluations);
+        memberCSChatMap.remove(memberId);
+
+        return CSChatHistory.builder()
+                .chatEvaluations(csChatRepository.save(csChat).getChatHistory())
+                .build();
+    }
+
+    private CSChat findCSChatByChatId(String chatId) {
+        return csChatRepository.findById(chatId)
                 .orElseThrow(() -> new CustomException(CustomResponseStatus.CS_CHAT_NOT_FOUND));
+    }
 
-        return allOfFuture.thenApply(v -> {
-            log.info("[평가 끝] 모든 비동기 요청 작업 종료");
-            evaluations.forEach(e -> e.thenAccept(chatEvaluations::add));
+    private void addMemberAnswerToChatMap(ChatRequest chatRequest, String answer) {
+        addMessageToMap(chatRequest, GPTRoleType.USER, answer);
+    }
 
-            csChat.updateChatHistory(chatEvaluations);
-            csChat.terminateCsChat();
-            CSChat save = csChatRepository.save(csChat);
-            memberCSChatMap.remove(memberId);
+    private void addGPTQuestionToChatMap(ChatRequest chatRequest, String question) {
+        addMessageToMap(chatRequest, GPTRoleType.ASSISTANT, question);
+    }
 
-            return CSChatHistory.builder()
-                    .chatEvaluations(save.getChatHistory())
-                    .build();
-        }).join();
+    private void addSystemInitialPromptToChatMap(ChatRequest chatRequest, String prompt) {
+        addMessageToMap(chatRequest, GPTRoleType.SYSTEM, prompt);
+    }
+
+    private void addMessageToMap(ChatRequest chatRequest, GPTRoleType gptRoleType, String message) {
+        chatRequest.addMessage(gptRoleType.getRole(), message);
+    }
+
+    private void initializeMemberEvaluation(String memberId) {
+        memberEvaluations.put(memberId, new LinkedList<>());
     }
 
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {
-        addChatMessage(chatRequest, GPTRoleType.USER.getRole(), INITIAL_USER_MESSAGE);
+        addMemberAnswerToChatMap(chatRequest, INITIAL_USER_MESSAGE);
 
         String question = generateAndAddNewQuestion(chatRequest);
         memberCSChatMap.put(memberId, chatRequest);
@@ -119,26 +150,20 @@ public class CSServiceImpl implements CSService {
                 .build();
     }
 
+    private ChatRequest getChatRequestByMemberId(String memberId) {
+        return memberCSChatMap.get(memberId);
+    }
+
     private String generateAndAddNewQuestion(ChatRequest chatRequest) {
         String newQuestion = gptService.getNewQuestion(chatRequest);
-        addChatMessage(chatRequest, GPTRoleType.ASSISTANT.getRole(), newQuestion);
+        addGPTQuestionToChatMap(chatRequest, newQuestion);
         return newQuestion;
     }
 
-    private void addChatMessage(ChatRequest chatRequest, String role, String message) {
-        chatRequest.addMessage(role, message);
-    }
-
-    private void addEvaluationToMember(String memberId, String question, String answer) {
+    private void addEvaluationWithAsync(String memberId, String question, String answer) {
         final CompletableFuture<ChatEvaluation> chatEvaluationFuture = evaluationService.getEvaluation(question, answer);
         List<CompletableFuture<ChatEvaluation>> completableFutures = memberEvaluations.computeIfAbsent(memberId, k -> new ArrayList<>());
         completableFutures.add(chatEvaluationFuture);
-    }
-
-    private static void logChatMessage(ChatRequest chatRequest) {
-        for (Message message : chatRequest.getMessages()) {
-            log.info("role = " + message.getRole() + ", message = " + message.getContent());
-        }
     }
 
     private void validateMember(String memberId, ValidationType validationType) {
@@ -157,6 +182,12 @@ public class CSServiceImpl implements CSService {
                     throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
                 }
                 break;
+        }
+    }
+
+    private void validAccumulatedEvaluations(List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync) {
+        if (accumulatedEvaluationsWithAsync == null || accumulatedEvaluationsWithAsync.isEmpty()) {
+            throw new CustomException(CustomResponseStatus.EVALUATION_NOT_FOUND);
         }
     }
 }

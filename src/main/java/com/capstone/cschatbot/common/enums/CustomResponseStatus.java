@@ -38,6 +38,7 @@ public enum CustomResponseStatus {
     EVALUATION_SERVER_NOT_ANSWER(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4006", "평가서버가 응답하지 않습니다."),
     CS_CHAT_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4007", "해당 CS 채팅이 존재하지 않습니다."),
     SELF_INTRO_CHAT_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4008", "해당 자기소개서 채팅이 존재하지 않습니다."),
+    EVALUATION_NOT_FOUND(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), "4009", "해당 채팅의 평가 내역을 찾을 수 없습니다."),
 
     /***
      * 5000: NOT_MATCH
@@ -46,9 +47,10 @@ public enum CustomResponseStatus {
     BAD_TOKEN(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()), "5001", "잘못된 토큰입니다."),
 
     /***
-     * 6000: Internal_Server_Error
+     * 6000: Server_Error
      */
-    INTERNAL_SERVER_ERROR(HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), "6000", "내부 서버 오류입니다.");
+    INTERNAL_SERVER_ERROR(HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), "6000", "내부 서버 오류입니다."),
+    ASYNC_COMPLETION_ERROR(HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), "6001", "비동기 작업에서 오류가 발생하였습니다.");
 
 
     private final HttpStatusCode httpStatusCode;
