@@ -1,7 +1,6 @@
 package com.capstone.cschatbot.selfIntro.service;
 
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
-import com.capstone.cschatbot.chat.domain.enums.ValidationType;
 import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatRequest;
 import com.capstone.cschatbot.selfIntro.dto.response.NewQuestionAndGrade;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
@@ -32,8 +31,6 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     public QuestionAndChatId initiateSelfIntroChat(String memberId, SelfIntroChatRequest chat) {
-        validateMember(memberId, ValidationType.MUST_NOT_EXIST);
-
         ChatRequest chatRequest = ChatRequest.createDefault();
         addSystemInitialPromptToChatMap(chatRequest, chatUtil.createSelfIntroInitialPrompt(chat));
         return initiateSelfIntroChatWithGPT(memberId, chatRequest);
@@ -41,7 +38,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     public NewQuestionAndGrade processSelfIntroChat(String memberId, ClientAnswer clientAnswer, String chatRoomId) {
-        validateMember(memberId, ValidationType.MUST_EXIST);
+        validateMember(memberId);
 
         ChatRequest chatRequest = memberSelfIntroChatMap.get(memberId);
 
@@ -79,7 +76,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     public void terminateSelfIntroChat(String memberId, String chatRoomId) {
-        validateMember(memberId, ValidationType.MUST_EXIST);
+        validateMember(memberId);
 
         SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
         selfIntro.terminateSelfIntroChat();
@@ -123,12 +120,9 @@ public class SelfIntroServiceImpl implements SelfIntroService {
                 .build();
     }
 
-    private void validateMember(String memberId, ValidationType validationType) {
-        boolean exists = memberSelfIntroChatMap.containsKey(memberId);
-        if (validationType == ValidationType.MUST_EXIST && (!exists))
+    private void validateMember(String memberId) {
+        if (!memberSelfIntroChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-
-        if (validationType == ValidationType.MUST_NOT_EXIST && exists)
-            throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.capstone.cschatbot.cs.service;
 import com.capstone.cschatbot.chat.domain.gpt.Message;
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
-import com.capstone.cschatbot.chat.domain.enums.ValidationType;
 import com.capstone.cschatbot.chat.domain.gpt.ChatRequest;
 import com.capstone.cschatbot.chat.domain.enums.GPTRoleType;
 import com.capstone.cschatbot.chat.service.gpt.GPTService;
@@ -43,8 +42,6 @@ public class CSServiceImpl implements CSService {
 
     @Override
     public QuestionAndChatId initiateCSChat(String memberId, String topic) {
-        validateMember(memberId, ValidationType.MUST_NOT_EXIST);
-
         initializeMemberEvaluation(memberId);
 
         ChatRequest chatRequest = ChatRequest.createDefault();
@@ -55,7 +52,7 @@ public class CSServiceImpl implements CSService {
 
     @Override
     public NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer) {
-        validateMember(memberId, ValidationType.MUST_EXIST);
+        validateMember(memberId);
 
         ChatRequest chatRequest = getChatRequestByMemberId(memberId);
         String question = chatRequest.findRecentQuestion();
@@ -73,7 +70,7 @@ public class CSServiceImpl implements CSService {
 
     @Override
     public CSChatHistory terminateCSChat(String memberId, String chatId) {
-        validateMember(memberId, ValidationType.MUST_EXIST);
+        validateMember(memberId);
 
         List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync = memberEvaluations.remove(memberId);
         validAccumulatedEvaluations(accumulatedEvaluationsWithAsync);
@@ -169,22 +166,9 @@ public class CSServiceImpl implements CSService {
         completableFutures.add(chatEvaluationFuture);
     }
 
-    private void validateMember(String memberId, ValidationType validationType) {
-        boolean exists = memberCSChatMap.containsKey(memberId);
-        switch (validationType) {
-            case MUST_NOT_EXIST:
-                if (exists) {
-                    throw new CustomException(CustomResponseStatus.ALREADY_MAP_EXIST);
-                }
-                if (memberEvaluations.containsKey(memberId)) {
-                    throw new CustomException(CustomResponseStatus.ALREADY_EVALUATION_MAP_EXIST);
-                }
-                break;
-            case MUST_EXIST:
-                if (!exists) {
-                    throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-                }
-                break;
+    private void validateMember(String memberId) {
+        if (!memberCSChatMap.containsKey(memberId)) {
+            throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
         }
     }
 
