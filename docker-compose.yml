@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  redis:
+    restart: always
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+  springboot:
+    restart: always
+    container_name: cspeak
+    depends_on:
+      - redis
+      - mongodb
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  mongodb:
+    restart: always
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
+    container_name: docker-mongodb
+    hostname: mongo
