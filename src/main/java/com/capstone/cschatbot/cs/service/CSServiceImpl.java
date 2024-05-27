@@ -1,5 +1,6 @@
 package com.capstone.cschatbot.cs.service;
 
+import com.capstone.cschatbot.chat.domain.gpt.Message;
 import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.chat.domain.enums.ValidationType;
@@ -59,7 +60,9 @@ public class CSServiceImpl implements CSService {
         ChatRequest chatRequest = getChatRequestByMemberId(memberId);
         String question = chatRequest.findRecentQuestion();
         String answer = clientAnswer.answer();
-
+        for (Message message : chatRequest.getMessages()) {
+            log.info("content: {}", message.getContent());
+        }
         addEvaluationWithAsync(memberId, question, answer);
         addMemberAnswerToChatMap(chatRequest, answer);
 
