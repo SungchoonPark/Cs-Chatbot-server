@@ -76,4 +76,13 @@ public class SelfIntroController {
         SelfIntroDetail response = selfIntroQueryService.findSelfIntro(chatId);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
+
+    @DeleteMapping("/self_intro/{chatId}")
+    public ResponseEntity<ApiResponse<String>> deleteSelfIntroChat(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable String chatId
+    ) {
+        selfIntroService.deleteSelfIntroChat(principalDetails.getMemberId(), chatId);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess("null", CustomResponseStatus.SUCCESS));
+    }
 }
