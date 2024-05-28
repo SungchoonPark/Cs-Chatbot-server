@@ -15,9 +15,12 @@ services:
     depends_on:
       - redis
       - mongodb
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+#   이거는 현재 Dockerfile로 빌드를 하는거임
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+    # docker hub를 이용하여 이미지를 띄어놓음 그 이미지를 가져오는것
+    image: songchoon/cspeak:latest
     ports:
       - "8080:8080"
     environment:
