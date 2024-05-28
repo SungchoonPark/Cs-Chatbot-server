@@ -10,4 +10,5 @@ public interface CSService {
     QuestionAndChatId initiateCSChat(String memberId, String topic);
     NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer);
     CSChatHistory terminateCSChat(String memberId, String chatRoomId);
+    void deleteCSChat(String memberId, String chatRoomId);
 }

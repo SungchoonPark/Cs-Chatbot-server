@@ -83,5 +83,12 @@ public class CSController {
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
-
+    @DeleteMapping("/cs/{chatId}")
+    public ResponseEntity<ApiResponse<String>> deleteCSChat(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable String chatId
+    ) {
+        csService.deleteCSChat(principalDetails.getMemberId(), chatId);
+        return ResponseEntity.ok().body(ApiResponse.createSuccess("null", CustomResponseStatus.SUCCESS));
+    }
 }

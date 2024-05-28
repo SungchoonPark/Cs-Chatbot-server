@@ -15,6 +15,7 @@ import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.domain.CSChat;
 import com.capstone.cschatbot.cs.domain.ChatEvaluation;
 import com.capstone.cschatbot.cs.repository.CSChatRepository;
+import com.capstone.cschatbot.selfIntro.entity.SelfIntro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,15 @@ public class CSServiceImpl implements CSService {
                 chatId,
                 memberId
         );
+    }
+
+    @Override
+    public void deleteCSChat(String memberId, String chatRoomId) {
+        CSChat csChat = csChatRepository.findById(chatRoomId)
+                .orElseThrow(() -> new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH));
+        checkEqualMember(memberId, csChat);
+
+        csChatRepository.deleteById(chatRoomId);
     }
 
     private CSChatHistory completeEvaluationsAndTerminateChat(
@@ -169,6 +179,12 @@ public class CSServiceImpl implements CSService {
     private void validateMember(String memberId) {
         if (!memberCSChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
+        }
+    }
+
+    private static void checkEqualMember(String memberId, CSChat csChat) {
+        if (!csChat.getMemberId().equals(memberId)) {
+            throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
         }
     }
 
