@@ -15,6 +15,7 @@ import com.capstone.cschatbot.selfIntro.entity.SelfIntroChat;
 import com.capstone.cschatbot.selfIntro.repository.SelfIntroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
     private final Map<String, ChatRequest> memberSelfIntroChatMap = new HashMap<>();
 
     @Override
+    @Transactional
     public QuestionAndChatId initiateSelfIntroChat(String memberId, SelfIntroChatRequest chat) {
         ChatRequest chatRequest = ChatRequest.createDefault();
         addSystemInitialPromptToChatMap(chatRequest, chatUtil.createSelfIntroInitialPrompt(chat));
@@ -37,6 +39,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
     }
 
     @Override
+    @Transactional
     public NewQuestionAndGrade processSelfIntroChat(String memberId, ClientAnswer clientAnswer, String chatRoomId) {
         validateMember(memberId);
 
@@ -53,6 +56,27 @@ public class SelfIntroServiceImpl implements SelfIntroService {
                 answer,
                 getSelfIntroByChatRoomId(chatRoomId)
         );
+    }
+
+    @Override
+    @Transactional
+    public void terminateSelfIntroChat(String memberId, String chatRoomId) {
+        validateMember(memberId);
+
+        SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
+        selfIntro.terminateSelfIntroChat();
+        selfIntroRepository.save(selfIntro);
+
+        memberSelfIntroChatMap.remove(memberId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSelfIntroChat(String memberId, String chatRoomId) {
+        SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
+        checkEqualMember(memberId, selfIntro);
+
+        selfIntroRepository.deleteById(chatRoomId);
     }
 
     private NewQuestionAndGrade processNewQuestionAndGrade(String newQuestion, ChatRequest chatRequest, String question, String answer, SelfIntro selfIntro) {
@@ -72,25 +96,6 @@ public class SelfIntroServiceImpl implements SelfIntroService {
                 .question(processedQuestion)
                 .grade(gradeOfAnswer)
                 .build();
-    }
-
-    @Override
-    public void terminateSelfIntroChat(String memberId, String chatRoomId) {
-        validateMember(memberId);
-
-        SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
-        selfIntro.terminateSelfIntroChat();
-        selfIntroRepository.save(selfIntro);
-
-        memberSelfIntroChatMap.remove(memberId);
-    }
-
-    @Override
-    public void deleteSelfIntroChat(String memberId, String chatRoomId) {
-        SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
-        checkEqualMember(memberId, selfIntro);
-
-        selfIntroRepository.deleteById(chatRoomId);
     }
 
     private void addMemberAnswerToChatMap(ChatRequest chatRequest, String answer) {

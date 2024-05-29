@@ -8,11 +8,13 @@ import com.capstone.cschatbot.selfIntro.entity.SelfIntro;
 import com.capstone.cschatbot.selfIntro.repository.SelfIntroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SelfIntroQueryServiceImpl implements SelfIntroQueryService {
     private final SelfIntroRepository selfIntroRepository;
 
