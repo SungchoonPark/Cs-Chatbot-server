@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
     private final ChatUtil chatUtil;
     private final SelfIntroRepository selfIntroRepository;
     private final GPTService gptService;
-    private final Map<String, ChatRequest> memberSelfIntroChatMap = new HashMap<>();
+    private final Map<String, ChatRequest> memberSelfIntroChatMap = new ConcurrentHashMap<>();
 
     @Override
     @Transactional

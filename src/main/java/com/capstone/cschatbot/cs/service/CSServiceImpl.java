@@ -38,7 +38,7 @@ public class CSServiceImpl implements CSService {
     private final EvaluationService evaluationService;
 
     private final CSChatRepository csChatRepository;
-    private final Map<String, ChatRequest> memberCSChatMap = new HashMap<>();
+    private final Map<String, ChatRequest> memberCSChatMap = new ConcurrentHashMap<>();
     private final Map<String, List<CompletableFuture<ChatEvaluation>>> memberEvaluations = new ConcurrentHashMap<>();
 
     @Override
