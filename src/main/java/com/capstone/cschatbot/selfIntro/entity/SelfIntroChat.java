@@ -3,8 +3,10 @@ package com.capstone.cschatbot.selfIntro.entity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SelfIntroChat {
     private String question;

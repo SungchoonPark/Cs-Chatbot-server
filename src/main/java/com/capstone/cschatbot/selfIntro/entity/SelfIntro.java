@@ -1,6 +1,7 @@
 package com.capstone.cschatbot.selfIntro.entity;
 
 import com.capstone.cschatbot.common.domain.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SelfIntro extends BaseEntity {
     @Id
     private String id;
