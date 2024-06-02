@@ -25,17 +25,14 @@ public class SelfIntroQueryServiceImpl implements SelfIntroQueryService {
     @Cacheable(value = "SelfIntros", key = "'selfAll'", unless = "#result == null", cacheManager = "oidcCacheManager")
     public SelfIntroList findAllSelfIntro(String memberId) {
         List<SelfIntro> selfIntros = selfIntroRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
-        List<SelfIntroDto> selfIntroDtos = new ArrayList<>();
+        List<SelfIntroDto> selfIntroDtos = selfIntros.stream()
+                .map(selfIntro -> SelfIntroDto.builder()
+                        .chatRoomId(selfIntro.getId())
+                        .createdAt(selfIntro.getCreatedAt().toLocalDate())
+                        .selfIntroChats(selfIntro.getSelfIntroChats())
+                        .build())
+                .toList();
 
-        for (SelfIntro selfIntro : selfIntros) {
-            selfIntroDtos.add(
-                    SelfIntroDto.builder()
-                            .chatRoomId(selfIntro.getId())
-                            .createdAt(selfIntro.getCreatedAt().toLocalDate())
-                            .selfIntroChats(selfIntro.getSelfIntroChats())
-                            .build()
-            );
-        }
 
         return SelfIntroList.builder()
                 .selfIntros(selfIntroDtos)
