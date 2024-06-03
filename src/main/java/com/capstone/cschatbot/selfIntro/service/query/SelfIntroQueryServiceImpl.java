@@ -21,7 +21,7 @@ public class SelfIntroQueryServiceImpl implements SelfIntroQueryService {
     private final SelfIntroRepository selfIntroRepository;
 
     @Override
-    @Cacheable(value = "SelfIntros", key = "'selfAll'", unless = "#result == null", cacheManager = "oidcCacheManager")
+    @Cacheable(value = "SelfIntros", key = "'selfAll' + #memberId", unless = "#result == null", cacheManager = "oidcCacheManager")
     public SelfIntroList findAllSelfIntro(String memberId) {
         List<SelfIntro> selfIntros = selfIntroRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
         List<SelfIntroDto> selfIntroDtos = selfIntros.stream()
@@ -31,7 +31,6 @@ public class SelfIntroQueryServiceImpl implements SelfIntroQueryService {
                         .selfIntroChats(selfIntro.getSelfIntroChats())
                         .build())
                 .toList();
-
 
         return SelfIntroList.builder()
                 .selfIntros(selfIntroDtos)

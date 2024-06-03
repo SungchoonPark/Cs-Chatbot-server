@@ -14,6 +14,9 @@ import com.capstone.cschatbot.selfIntro.entity.SelfIntro;
 import com.capstone.cschatbot.selfIntro.entity.SelfIntroChat;
 import com.capstone.cschatbot.selfIntro.repository.SelfIntroRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +63,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "SelfIntros", key = "'selfAll' + #memberId", cacheManager = "oidcCacheManager")
     public void terminateSelfIntroChat(String memberId, String chatRoomId) {
         validateMember(memberId);
 
@@ -72,6 +76,10 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "SelfIntros", key = "'selfAll' + #memberId", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "SelfIntros", key = "#chatRoomId", cacheManager = "oidcCacheManager")
+    })
     public void deleteSelfIntroChat(String memberId, String chatRoomId) {
         SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
         checkEqualMember(memberId, selfIntro);
@@ -115,7 +123,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
     }
 
     private static void checkEqualMember(String memberId, SelfIntro selfIntro) {
-        if(!selfIntro.getMemberId().equals(memberId)) {
+        if (!selfIntro.getMemberId().equals(memberId)) {
             throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
         }
     }

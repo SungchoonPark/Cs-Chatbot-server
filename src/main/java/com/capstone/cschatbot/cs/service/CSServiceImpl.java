@@ -18,7 +18,11 @@ import com.capstone.cschatbot.cs.repository.CSChatRepository;
 import com.capstone.cschatbot.selfIntro.entity.SelfIntro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +46,7 @@ public class CSServiceImpl implements CSService {
     private final Map<String, List<CompletableFuture<ChatEvaluation>>> memberEvaluations = new ConcurrentHashMap<>();
 
     @Override
+    @Transactional
     public QuestionAndChatId initiateCSChat(String memberId, String topic) {
         initializeMemberEvaluation(memberId);
 
@@ -52,6 +57,7 @@ public class CSServiceImpl implements CSService {
     }
 
     @Override
+    @Transactional
     public NewQuestion processCSChat(String memberId, ClientAnswer clientAnswer) {
         validateMember(memberId);
 
@@ -70,7 +76,17 @@ public class CSServiceImpl implements CSService {
     }
 
     @Override
-    public CSChatHistory terminateCSChat(String memberId, String chatId) {
+    @Transactional
+    @Caching(evict = {
+            // Todo : 추후 topic을 매개변수로 받아서 처리해줘야함. API 변경해야함.
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':운영체제'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':컴퓨터네트워크'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':알고리즘'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':데이터베이스'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAllTopic:' + #memberId", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChat", key = "#chatRoomId", cacheManager = "oidcCacheManager")
+    })
+    public CSChatHistory terminateCSChat(String memberId, String chatRoomId) {
         validateMember(memberId);
 
         List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync = memberEvaluations.remove(memberId);
@@ -81,12 +97,22 @@ public class CSServiceImpl implements CSService {
         return completeEvaluationsAndTerminateChat(
                 allEvaluationsFuture,
                 accumulatedEvaluationsWithAsync,
-                chatId,
+                chatRoomId,
                 memberId
         );
     }
 
     @Override
+    @Transactional
+    @Caching(evict = {
+            // Todo : 추후 topic을 매개변수로 받아서 처리해줘야함. API 변경해야함.
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':운영체제'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':컴퓨터네트워크'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':알고리즘'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':데이터베이스'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAllTopic:' + #memberId", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChat", key = "#chatRoomId", cacheManager = "oidcCacheManager")
+    })
     public void deleteCSChat(String memberId, String chatRoomId) {
         CSChat csChat = csChatRepository.findById(chatRoomId)
                 .orElseThrow(() -> new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH));
