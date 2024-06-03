@@ -21,7 +21,7 @@ public class CSQueryServiceImpl implements CSQueryService{
     private final CSChatRepository csChatRepository;
 
     @Override
-    @Cacheable(value = "CSChats", key = "'csAllTopic'", unless = "#result == null", cacheManager = "oidcCacheManager")
+    @Cacheable(value = "CSChats", key = "'csAllTopic:' + #memberId", unless = "#result == null", cacheManager = "oidcCacheManager")
     public CSChatHistoryList findAllCSChat(String memberId) {
         List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTerminateStatusTrue(memberId);
         List<CSChatDto> csChatDtos = getCsChatDtos(csChats);
@@ -32,7 +32,7 @@ public class CSQueryServiceImpl implements CSQueryService{
     }
 
     @Override
-    @Cacheable(value = "CSChats", key = "'csAll'", unless = "#result == null", cacheManager = "oidcCacheManager")
+    @Cacheable(value = "CSChats", key = "'csAll:' + #memberId + ':' + #topic", unless = "#result == null", cacheManager = "oidcCacheManager")
     public CSChatHistoryList findAllCSChatByTopic(String memberId, String topic) {
         List<CSChat> csChats = csChatRepository.findAllByMemberIdAndTopicEqualsAndTerminateStatusTrue(memberId, topic);
         List<CSChatDto> csChatDtos = getCsChatDtos(csChats);
