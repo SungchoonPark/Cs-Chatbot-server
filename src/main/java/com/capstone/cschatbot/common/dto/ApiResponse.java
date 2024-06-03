@@ -18,14 +18,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 public class ApiResponse<T> {
-    private HttpStatusCode httpStatusCode;
+    private int httpStatusCode;
     private String code;
     private String message;
     private T data;
 
     public static <T> ApiResponse<T> createSuccess(T data, CustomResponseStatus customResponseStatus) {
         return new ApiResponse<>(
-                HttpStatusCode.valueOf(HttpStatus.OK.value()),
+                customResponseStatus.getHttpStatusCode(),
                 customResponseStatus.getCode(),
                 customResponseStatus.getMessage(),
                 data);
@@ -48,7 +48,7 @@ public class ApiResponse<T> {
         }
 
         return new ApiResponse<>(
-                HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()),
+                HttpStatus.BAD_REQUEST.value(),
                 "NOT_VALID",
                 "유효하지 않은 데이터입니다.",
                 errors
