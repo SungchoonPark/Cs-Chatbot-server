@@ -11,6 +11,7 @@ import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.config.security.service.PrincipalDetails;
 import com.capstone.cschatbot.selfIntro.service.SelfIntroService;
 import com.capstone.cschatbot.selfIntro.service.query.SelfIntroQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +28,7 @@ public class SelfIntroController {
     @GetMapping("/initial/chat/self_intro")
     public ResponseEntity<ApiResponse<QuestionAndChatId>> initiateSelfIntroChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @ModelAttribute SelfIntroChatRequest chat
+            @ModelAttribute @Valid SelfIntroChatRequest chat
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(

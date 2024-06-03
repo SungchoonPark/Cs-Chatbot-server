@@ -10,6 +10,7 @@ import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.service.CSService;
 import com.capstone.cschatbot.cs.service.query.CSQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class CSController {
     @GetMapping("/chat/cs")
     public ResponseEntity<ApiResponse<NewQuestion>> processCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "client_answer") ClientAnswer clientAnswer
+            @RequestParam(name = "client_answer") @Valid ClientAnswer clientAnswer
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(

@@ -2,7 +2,6 @@ package com.capstone.cschatbot.member.controller;
 
 import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
-import com.capstone.cschatbot.member.dto.MemberDto;
 import com.capstone.cschatbot.member.dto.response.Reissue;
 import com.capstone.cschatbot.member.dto.response.SignIn;
 import com.capstone.cschatbot.member.service.AuthService;
