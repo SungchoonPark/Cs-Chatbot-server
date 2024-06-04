@@ -45,7 +45,7 @@ public enum CustomResponseStatus {
      */
     REFRESH_TOKEN_NOT_MATCH(HttpStatus.CONFLICT.value(), "5000", "잘못된 리프레시 토큰입니다."),
     BAD_TOKEN(HttpStatus.BAD_REQUEST.value(), "5001", "잘못된 토큰입니다."),
-    MEMBER_NOT_MATCH(HttpStatus.BAD_REQUEST.value(), "5002", "사용자가 일치하지 않습니다."),
+    MEMBER_NOT_MATCH(HttpStatus.FORBIDDEN.value(), "5002", "사용자가 일치하지 않습니다."),
 
     /***
      * 6000: Server_Error
