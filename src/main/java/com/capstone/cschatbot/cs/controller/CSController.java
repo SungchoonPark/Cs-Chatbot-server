@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.cs.controller;
 
-import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.cs.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;

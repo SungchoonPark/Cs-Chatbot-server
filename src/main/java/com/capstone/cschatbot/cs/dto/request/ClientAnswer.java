@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.chat.dto.request;
+package com.capstone.cschatbot.cs.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,7 +1,6 @@
 package com.capstone.cschatbot.cs.service;
 
-import com.capstone.cschatbot.chat.domain.gpt.Message;
-import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.cs.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.chat.domain.gpt.ChatRequest;
 import com.capstone.cschatbot.chat.domain.enums.GPTRoleType;
@@ -16,11 +15,9 @@ import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.domain.CSChat;
 import com.capstone.cschatbot.cs.domain.ChatEvaluation;
 import com.capstone.cschatbot.cs.repository.CSChatRepository;
-import com.capstone.cschatbot.selfIntro.entity.SelfIntro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

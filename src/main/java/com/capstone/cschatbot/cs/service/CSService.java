@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.cs.service;
 
-import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.cs.dto.request.ClientAnswer;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.cs.dto.request.CSChatInfo;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
