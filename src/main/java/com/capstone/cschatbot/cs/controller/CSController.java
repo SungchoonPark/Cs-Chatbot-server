@@ -5,6 +5,7 @@ import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
 import com.capstone.cschatbot.common.dto.ApiResponse;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.config.security.service.PrincipalDetails;
+import com.capstone.cschatbot.cs.dto.request.CSChatInfo;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistoryList;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
@@ -25,7 +26,7 @@ public class CSController {
     private final CSService csService;
     private final CSQueryService csQueryService;
     // CS 첫 채팅 API
-    @GetMapping("/initial/chat/cs/{topic}")
+    @PostMapping("/initial/chat/cs/{topic}")
     public ResponseEntity<ApiResponse<QuestionAndChatId>> initiateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable String topic) {
@@ -37,10 +38,10 @@ public class CSController {
     }
 
     // CS 채팅 진행 API
-    @GetMapping("/chat/cs")
+    @PostMapping("/chat/cs")
     public ResponseEntity<ApiResponse<NewQuestion>> processCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "client_answer") @Valid ClientAnswer clientAnswer
+            @RequestBody @Valid ClientAnswer clientAnswer
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
@@ -50,12 +51,12 @@ public class CSController {
     }
 
     // CS 채팅 종료
-    @PostMapping("/end/chat/cs/{chatId}")
+    @PostMapping("/end/chat/cs")
     public ResponseEntity<ApiResponse<CSChatHistory>> terminateCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable String chatId
+            @RequestBody CSChatInfo csChatInfo
     ) {
-        CSChatHistory response = csService.terminateCSChat(principalDetails.getMemberId(), chatId);
+        CSChatHistory response = csService.terminateCSChat(principalDetails.getMemberId(), csChatInfo);
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
@@ -84,12 +85,12 @@ public class CSController {
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
-    @DeleteMapping("/cs/{chatId}")
+    @DeleteMapping("/cs")
     public ResponseEntity<ApiResponse<String>> deleteCSChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable String chatId
+            @RequestBody CSChatInfo csChatInfo
     ) {
-        csService.deleteCSChat(principalDetails.getMemberId(), chatId);
+        csService.deleteCSChat(principalDetails.getMemberId(), csChatInfo);
         return ResponseEntity.ok().body(ApiResponse.createSuccess("null", CustomResponseStatus.SUCCESS));
     }
 }

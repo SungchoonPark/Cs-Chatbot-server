@@ -10,6 +10,7 @@ import com.capstone.cschatbot.chat.service.evaluation.EvaluationService;
 import com.capstone.cschatbot.chat.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
+import com.capstone.cschatbot.cs.dto.request.CSChatInfo;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.domain.CSChat;
@@ -64,9 +65,7 @@ public class CSServiceImpl implements CSService {
         ChatRequest chatRequest = getChatRequestByMemberId(memberId);
         String question = chatRequest.findRecentQuestion();
         String answer = clientAnswer.answer();
-        for (Message message : chatRequest.getMessages()) {
-            log.info("content: {}", message.getContent());
-        }
+
         addEvaluationWithAsync(memberId, question, answer);
         addMemberAnswerToChatMap(chatRequest, answer);
 
@@ -78,15 +77,11 @@ public class CSServiceImpl implements CSService {
     @Override
     @Transactional
     @Caching(evict = {
-            // Todo : 추후 topic을 매개변수로 받아서 처리해줘야함. API 변경해야함.
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':운영체제'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':컴퓨터네트워크'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':알고리즘'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':데이터베이스'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':' + #csChatInfo.topic()", cacheManager = "oidcCacheManager"),
             @CacheEvict(value = "CSChats", key = "'csAllTopic:' + #memberId", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChat", key = "#chatRoomId", cacheManager = "oidcCacheManager")
+            @CacheEvict(value = "CSChat", key = "#csChatInfo.chatRoomId()", cacheManager = "oidcCacheManager")
     })
-    public CSChatHistory terminateCSChat(String memberId, String chatRoomId) {
+    public CSChatHistory terminateCSChat(String memberId, CSChatInfo csChatInfo) {
         validateMember(memberId);
 
         List<CompletableFuture<ChatEvaluation>> accumulatedEvaluationsWithAsync = memberEvaluations.remove(memberId);
@@ -97,7 +92,7 @@ public class CSServiceImpl implements CSService {
         return completeEvaluationsAndTerminateChat(
                 allEvaluationsFuture,
                 accumulatedEvaluationsWithAsync,
-                chatRoomId,
+                csChatInfo.chatRoomId(),
                 memberId
         );
     }
@@ -105,20 +100,16 @@ public class CSServiceImpl implements CSService {
     @Override
     @Transactional
     @Caching(evict = {
-            // Todo : 추후 topic을 매개변수로 받아서 처리해줘야함. API 변경해야함.
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':운영체제'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':컴퓨터네트워크'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':알고리즘'", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':데이터베이스'", cacheManager = "oidcCacheManager"),
+            @CacheEvict(value = "CSChats", key = "'csAll:' + #memberId + ':' + #csChatInfo.topic()", cacheManager = "oidcCacheManager"),
             @CacheEvict(value = "CSChats", key = "'csAllTopic:' + #memberId", cacheManager = "oidcCacheManager"),
-            @CacheEvict(value = "CSChat", key = "#chatRoomId", cacheManager = "oidcCacheManager")
+            @CacheEvict(value = "CSChat", key = "#csChatInfo.chatRoomId()", cacheManager = "oidcCacheManager")
     })
-    public void deleteCSChat(String memberId, String chatRoomId) {
-        CSChat csChat = csChatRepository.findById(chatRoomId)
+    public void deleteCSChat(String memberId, CSChatInfo csChatInfo) {
+        CSChat csChat = csChatRepository.findById(csChatInfo.chatRoomId())
                 .orElseThrow(() -> new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH));
         checkEqualMember(memberId, csChat);
 
-        csChatRepository.deleteById(chatRoomId);
+        csChatRepository.deleteById(csChatInfo.chatRoomId());
     }
 
     private CSChatHistory completeEvaluationsAndTerminateChat(
