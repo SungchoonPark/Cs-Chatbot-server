@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.selfIntro.controller;
 
-import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatInfo;
 import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatRequest;
 import com.capstone.cschatbot.selfIntro.dto.response.NewQuestionAndGrade;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
@@ -25,10 +25,10 @@ public class SelfIntroController {
     private final SelfIntroQueryService selfIntroQueryService;
 
     // 자소서 채팅 시작
-    @GetMapping("/initial/chat/self_intro")
+    @PostMapping("/initial/chat/self_intro")
     public ResponseEntity<ApiResponse<QuestionAndChatId>> initiateSelfIntroChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @ModelAttribute @Valid SelfIntroChatRequest chat
+            @RequestBody @Valid SelfIntroChatRequest chat
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
@@ -38,15 +38,14 @@ public class SelfIntroController {
     }
 
     // 자소서 채팅 ing
-    @GetMapping("/chat/self_intro/{chatId}")
+    @PostMapping("/chat/self_intro")
     public ResponseEntity<ApiResponse<NewQuestionAndGrade>> processSelfChat(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable String chatId,
-            @RequestParam(name = "client_answer") ClientAnswer clientAnswer
+            @RequestBody SelfIntroChatInfo selfIntroChatInfo
     ) {
 
         return ResponseEntity.ok().body(ApiResponse.createSuccess(
-                selfIntroService.processSelfIntroChat(principalDetails.getMemberId(), clientAnswer, chatId),
+                selfIntroService.processSelfIntroChat(principalDetails.getMemberId(), selfIntroChatInfo),
                 CustomResponseStatus.SUCCESS)
         );
     }
@@ -70,6 +69,7 @@ public class SelfIntroController {
         return ResponseEntity.ok().body(ApiResponse.createSuccess(response, CustomResponseStatus.SUCCESS));
     }
 
+    // 자소서 채팅 상세 조회
     @GetMapping("/self_intro/{chatId}")
     public ResponseEntity<ApiResponse<SelfIntroDetail>> getSelfIntroChat(
             @PathVariable String chatId

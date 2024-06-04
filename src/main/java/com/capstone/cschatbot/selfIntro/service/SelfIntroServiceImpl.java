@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.selfIntro.service;
 
-import com.capstone.cschatbot.chat.dto.request.ClientAnswer;
+import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatInfo;
 import com.capstone.cschatbot.selfIntro.dto.request.SelfIntroChatRequest;
 import com.capstone.cschatbot.selfIntro.dto.response.NewQuestionAndGrade;
 import com.capstone.cschatbot.chat.dto.response.QuestionAndChatId;
@@ -15,7 +15,6 @@ import com.capstone.cschatbot.selfIntro.entity.SelfIntroChat;
 import com.capstone.cschatbot.selfIntro.repository.SelfIntroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +42,13 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     @Override
     @Transactional
-    public NewQuestionAndGrade processSelfIntroChat(String memberId, ClientAnswer clientAnswer, String chatRoomId) {
+    public NewQuestionAndGrade processSelfIntroChat(String memberId, SelfIntroChatInfo selfIntroChatInfo) {
         validateMember(memberId);
 
         ChatRequest chatRequest = memberSelfIntroChatMap.get(memberId);
 
         String question = chatRequest.findRecentQuestion();
-        String answer = clientAnswer.answer();
+        String answer = selfIntroChatInfo.clientAnswer();
         addMemberAnswerToChatMap(chatRequest, answer);
 
         return processNewQuestionAndGrade(
@@ -57,7 +56,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
                 chatRequest,
                 question,
                 answer,
-                getSelfIntroByChatRoomId(chatRoomId)
+                getSelfIntroByChatRoomId(selfIntroChatInfo.chatRoomId())
         );
     }
 
