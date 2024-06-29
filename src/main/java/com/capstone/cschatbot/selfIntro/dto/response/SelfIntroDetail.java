@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.selfIntro.dto.response;
 
-import com.capstone.cschatbot.selfIntro.entity.SelfIntroChat;
+import com.capstone.cschatbot.selfIntro.domain.SelfIntroChat;
 import lombok.Builder;
 
 import java.util.List;

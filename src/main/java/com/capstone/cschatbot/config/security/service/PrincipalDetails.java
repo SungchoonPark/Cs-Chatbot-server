@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.config.security.service;
 
-import com.capstone.cschatbot.member.entity.Member;
+import com.capstone.cschatbot.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

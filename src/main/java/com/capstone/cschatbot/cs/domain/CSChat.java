@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.cs.domain;
 
-import com.capstone.cschatbot.common.domain.BaseEntity;
+import com.capstone.cschatbot.common.model.BaseEntity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

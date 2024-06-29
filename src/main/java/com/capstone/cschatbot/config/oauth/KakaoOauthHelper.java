@@ -2,7 +2,7 @@ package com.capstone.cschatbot.config.oauth;
 
 import com.capstone.cschatbot.config.oauth.dto.OIDCDecodePayload;
 import com.capstone.cschatbot.config.oauth.dto.OIDCPublicKeyResponse;
-import com.capstone.cschatbot.member.entity.enums.Provider;
+import com.capstone.cschatbot.member.domain.enums.Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

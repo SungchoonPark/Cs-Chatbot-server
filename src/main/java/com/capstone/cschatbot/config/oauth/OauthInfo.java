@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.config.oauth;
 
-import com.capstone.cschatbot.member.entity.enums.Provider;
+import com.capstone.cschatbot.member.domain.enums.Provider;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

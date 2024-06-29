@@ -1,8 +1,7 @@
 package com.capstone.cschatbot.config.restcli;
 
-import com.capstone.cschatbot.chat.domain.gpt.ChatResponse;
-import com.capstone.cschatbot.chat.service.evaluation.EvaluationComponent;
-import com.capstone.cschatbot.chat.service.gpt.GPTComponent;
+import com.capstone.cschatbot.cs.infrastructure.EvaluationComponent;
+import com.capstone.cschatbot.common.infrastructure.GPTComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

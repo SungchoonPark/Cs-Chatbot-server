@@ -2,8 +2,8 @@ package com.capstone.cschatbot.config.security.service;
 
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
-import com.capstone.cschatbot.member.entity.Member;
-import com.capstone.cschatbot.member.repository.MemberRepository;
+import com.capstone.cschatbot.member.domain.Member;
+import com.capstone.cschatbot.member.infrastructure.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

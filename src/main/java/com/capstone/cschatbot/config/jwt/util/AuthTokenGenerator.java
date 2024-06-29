@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.config.jwt.util;
 
-import com.capstone.cschatbot.common.domain.AuthTokens;
+import com.capstone.cschatbot.common.model.AuthTokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

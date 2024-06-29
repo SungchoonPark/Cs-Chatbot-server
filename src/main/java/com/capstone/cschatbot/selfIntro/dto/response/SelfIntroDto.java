@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.selfIntro.dto.response;
 
-import com.capstone.cschatbot.selfIntro.entity.SelfIntroChat;
+import com.capstone.cschatbot.selfIntro.domain.SelfIntroChat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
