@@ -1,5 +1,7 @@
 package com.capstone.cschatbot.cs.domain;
 
+import com.capstone.cschatbot.common.enums.CustomResponseStatus;
+import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.common.model.BaseEntity;
 import com.capstone.cschatbot.cs.dto.ChatEvaluation;
 import jakarta.persistence.Id;
@@ -37,6 +39,12 @@ public class CSChat extends BaseEntity {
     public void terminateProcess(List<ChatEvaluation> evaluations) {
         updateChatHistory(evaluations);
         terminateCsChat();
+    }
+
+    public void checkEqualMember(String memberId) {
+        if (this.memberId.equals(memberId)) {
+            throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
+        }
     }
 
     private void updateChatHistory(List<ChatEvaluation> evaluations) {

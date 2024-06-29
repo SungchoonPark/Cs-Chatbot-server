@@ -1,5 +1,7 @@
 package com.capstone.cschatbot.selfIntro.domain;
 
+import com.capstone.cschatbot.common.enums.CustomResponseStatus;
+import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.common.model.BaseEntity;
 import com.capstone.cschatbot.selfIntro.dto.SelfIntroChat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -37,6 +39,12 @@ public class SelfIntro extends BaseEntity {
 
     public void addSelfIntroChat(SelfIntroChat selfIntroChat) {
         selfIntroChats.add(selfIntroChat);
+    }
+
+    public void checkEqualMember(String memberId) {
+        if (this.memberId.equals(memberId)) {
+            throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
+        }
     }
 
     public void terminateSelfIntroChat() {

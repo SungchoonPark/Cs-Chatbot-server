@@ -81,7 +81,7 @@ public class SelfIntroServiceImpl implements SelfIntroService {
     })
     public void deleteSelfIntroChat(String memberId, String chatRoomId) {
         SelfIntro selfIntro = getSelfIntroByChatRoomId(chatRoomId);
-        checkEqualMember(memberId, selfIntro);
+        selfIntro.checkEqualMember(memberId);
 
         selfIntroRepository.deleteById(chatRoomId);
     }
@@ -119,12 +119,6 @@ public class SelfIntroServiceImpl implements SelfIntroService {
 
     private void addMessageToMap(ChatRequest chatRequest, GPTRoleType gptRoleType, String message) {
         chatRequest.addMessage(gptRoleType.getRole(), message);
-    }
-
-    private static void checkEqualMember(String memberId, SelfIntro selfIntro) {
-        if (!selfIntro.getMemberId().equals(memberId)) {
-            throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
-        }
     }
 
     private SelfIntro getSelfIntroByChatRoomId(String chatRoomId) {

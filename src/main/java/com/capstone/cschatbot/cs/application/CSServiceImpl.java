@@ -107,9 +107,9 @@ public class CSServiceImpl implements CSService {
             @CacheEvict(value = "CSChat", key = "#csChatInfo.chatRoomId()", cacheManager = "oidcCacheManager")
     })
     public void deleteCSChat(String memberId, CSChatInfo csChatInfo) {
-        CSChat csChat = csChatRepository.findById(csChatInfo.chatRoomId())
-                .orElseThrow(() -> new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH));
-        checkEqualMember(memberId, csChat);
+        csChatRepository.findById(csChatInfo.chatRoomId())
+                .orElseThrow(() -> new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH))
+                .checkEqualMember(memberId);
 
         csChatRepository.deleteById(csChatInfo.chatRoomId());
     }
@@ -200,12 +200,6 @@ public class CSServiceImpl implements CSService {
     private void validateMember(String memberId) {
         if (!memberCSChatMap.containsKey(memberId)) {
             throw new CustomException(CustomResponseStatus.MAP_VALUE_NOT_EXIST);
-        }
-    }
-
-    private static void checkEqualMember(String memberId, CSChat csChat) {
-        if (!csChat.getMemberId().equals(memberId)) {
-            throw new CustomException(CustomResponseStatus.MEMBER_NOT_MATCH);
         }
     }
 
