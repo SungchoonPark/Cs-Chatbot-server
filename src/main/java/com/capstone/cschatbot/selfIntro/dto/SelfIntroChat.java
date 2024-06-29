@@ -1,4 +1,4 @@
-package com.capstone.cschatbot.selfIntro.domain;
+package com.capstone.cschatbot.selfIntro.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

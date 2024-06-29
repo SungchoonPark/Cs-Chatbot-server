@@ -11,7 +11,7 @@ import com.capstone.cschatbot.common.util.ChatUtil;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;
 import com.capstone.cschatbot.selfIntro.domain.SelfIntro;
-import com.capstone.cschatbot.selfIntro.domain.SelfIntroChat;
+import com.capstone.cschatbot.selfIntro.dto.SelfIntroChat;
 import com.capstone.cschatbot.selfIntro.infrastructure.SelfIntroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;

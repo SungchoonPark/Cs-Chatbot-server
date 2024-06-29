@@ -1,6 +1,7 @@
 package com.capstone.cschatbot.selfIntro.domain;
 
 import com.capstone.cschatbot.common.model.BaseEntity;
+import com.capstone.cschatbot.selfIntro.dto.SelfIntroChat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
