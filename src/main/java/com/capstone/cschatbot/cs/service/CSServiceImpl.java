@@ -48,9 +48,12 @@ public class CSServiceImpl implements CSService {
     public QuestionAndChatId initiateCSChat(String memberId, String topic) {
         initializeMemberEvaluation(memberId);
 
+        // GPT와의 대화 축적 인스턴스 생성
         ChatRequest chatRequest = ChatRequest.createDefault();
+        // 프롬프팅 메시지 추가
         addSystemInitialPromptToChatMap(chatRequest, chatUtil.createCSInitialPrompt(topic));
 
+        // 새로운 채팅방을 DB에 저장하고 GPT로부터 질문 생성
         return initiateCSChatWithGPT(memberId, chatRequest, topic);
     }
 
@@ -63,9 +66,11 @@ public class CSServiceImpl implements CSService {
         String question = chatRequest.findRecentQuestion();
         String answer = clientAnswer.answer();
 
+        // 평가서버로부터 평가를 받아오는 로직은 비동기 방식으로 처리
         addEvaluationWithAsync(memberId, question, answer);
+        // 클라이언트의 답변을 채팅내역 저장 Map에 저장
         addMemberAnswerToChatMap(chatRequest, answer);
-
+        // 새로운 질문을 생성해서 리턴
         return NewQuestion.builder()
                 .question(generateAndAddNewQuestion(chatRequest))
                 .build();
@@ -163,9 +168,11 @@ public class CSServiceImpl implements CSService {
     private QuestionAndChatId initiateCSChatWithGPT(String memberId, ChatRequest chatRequest, String topic) {
         addMemberAnswerToChatMap(chatRequest, INITIAL_USER_MESSAGE);
 
+        // GPT로부터 첫 질문 받아옴
         String question = generateAndAddNewQuestion(chatRequest);
         memberCSChatMap.put(memberId, chatRequest);
 
+        // 새로 생긴 채팅방을 DB에 저장
         CSChat saveCSChat = csChatRepository.save(CSChat.of(memberId, topic));
 
         return QuestionAndChatId.builder()
