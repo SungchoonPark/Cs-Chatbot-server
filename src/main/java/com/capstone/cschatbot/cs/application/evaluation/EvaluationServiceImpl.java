@@ -1,7 +1,7 @@
 package com.capstone.cschatbot.cs.application.evaluation;
 
 import com.capstone.cschatbot.cs.infrastructure.EvaluationComponent;
-import com.capstone.cschatbot.cs.domain.ChatEvaluation;
+import com.capstone.cschatbot.cs.dto.ChatEvaluation;
 import com.capstone.cschatbot.cs.dto.response.Evaluation;
 import com.capstone.cschatbot.common.enums.CustomResponseStatus;
 import com.capstone.cschatbot.common.exception.CustomException;

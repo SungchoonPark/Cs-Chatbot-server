@@ -1,6 +1,6 @@
 package com.capstone.cschatbot.cs.dto.response;
 
-import com.capstone.cschatbot.cs.domain.ChatEvaluation;
+import com.capstone.cschatbot.cs.dto.ChatEvaluation;
 import lombok.Builder;
 
 import java.util.List;

@@ -13,7 +13,7 @@ import com.capstone.cschatbot.cs.dto.request.CSChatInfo;
 import com.capstone.cschatbot.cs.dto.response.CSChatHistory;
 import com.capstone.cschatbot.cs.dto.response.NewQuestion;
 import com.capstone.cschatbot.cs.domain.CSChat;
-import com.capstone.cschatbot.cs.domain.ChatEvaluation;
+import com.capstone.cschatbot.cs.dto.ChatEvaluation;
 import com.capstone.cschatbot.cs.infrastructure.CSChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
