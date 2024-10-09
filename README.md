@@ -70,5 +70,4 @@ https://youtu.be/mfyw0N5sm_w?si=uEOLzgp9QWuGh1En
 
 ## 🤔 고민과 개선
 - [RestTemplate를 RestClient로 ?!](https://choons.tistory.com/33)
-- [비동기를 적용해서 성능개선을 해보자]()
 - [캐싱기법과 캐싱적용에 대하여](https://choons.tistory.com/32)
